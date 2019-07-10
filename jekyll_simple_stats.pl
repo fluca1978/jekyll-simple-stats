@@ -233,7 +233,10 @@ say {$stats} << "_STATS_";
 <small>
 The above statistical data has been generated automatically on $now
 via <a href="https://github.com/fluca1978/jekyll-simple-stats" target="_new">
-    Jekyll Simple Stats by Luca Ferrari
+    Jekyll Simple Stats 
+    </a>
+    <a href="https://fluca1978.github.io" target="_new">
+    by Luca Ferrari
     </a>
 </small>
 _STATS_
