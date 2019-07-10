@@ -13,6 +13,7 @@ my ($opts, $usage) = describe_options(
     [ 'images|i=s', 'images directory (e.g., images/graphs)',                                       ],
     [ 'texts|t=s',  'path to put text files in markdown (e.g., _include/stats/)',                   ],
     [ 'verbose|v',  'verbose output'                                                                ],
+    [ 'quiet|q',   'quiet output (supress normal output)'                                           ],
     [ 'help',      'help output' , { shortcircuit => 1 }                                           ],
     [ 'count|c=s',  'tag count (default 10)' ,                                                      ],
     );
@@ -27,7 +28,11 @@ if ( $opts->help ){
 
     perl $0 -h ~/git/fluca1978.github.io
 HELP
-    }
+}
+
+
+# check that verbose and quite mode are not both active
+die "\nCannot specify `verbose` and `quiet` mode at the same time!\n" if ( $opts->verbose && $opts->quiet );
 
 
 # This is the hash that collects the data about all the posts.
@@ -91,7 +96,7 @@ $images_directory  = File::Spec->rel2abs( $images_directory );
 $include_directory = File::Spec->rel2abs( $include_directory );
 
 # inform the user about running directories
-say <<"_DIR_";
+say <<"_DIR_" unless( $opts->quiet );
 Running with the following directories:
     posts to index => $posts_directory
     graphs path    => $images_directory
@@ -235,7 +240,7 @@ _STATS_
 
 close $stats;
 
-say << "_HELP_";
+say << "_HELP_" unless( $opts->quiet );
 
 All done!
 Remember to include the stats file with something like this:
