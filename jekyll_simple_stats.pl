@@ -208,12 +208,18 @@ GNUPLOT
 
 
     # produce this year report on the stat markdown file
-    my $top_categories = join( ', ' , @keys[0,1,2] );
+    # please note that the categories for this year could be less than
+    # the number required by the user, so try to compute it and ajust to
+    # the minimum
+    my $top_categories_threshold = $top_tag_count < $#keys
+        ? $top_tag_count
+        : $#keys - 1;
+    my $top_categories = join( ', ' , @keys[ 0 .. $top_categories_threshold ] );
     say {$stats} << "_STATS_";
 ## $year
 <b>$posts->{ $year }->{ TOTAL } posts</b> written in $year.
 <br/>
-Top categories are: <b>$top_categories</b>
+Top <i>$top_categories_threshold</i> categories in <i>$year</i> are: <b>$top_categories</b>
 
 <center>
 <img src="/$images_relative_directory/$year.png" />
