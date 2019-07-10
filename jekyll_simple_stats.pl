@@ -126,6 +126,21 @@ say "Inspecting $opts->posts ... please wait" if ( $opts->verbose );
 find ( $post_filter, $posts_directory );
 # say Dumper( $posts );
 
+
+
+# generate a summary about all years and tags
+say {$stats} '## Blog Activity';
+say {$stats} 'The following is a glance at the blogging activity across all years:';
+for my $year ( reverse sort keys %$posts ){
+    next if ( ! int( $year ) );
+    say {$stats} sprintf ' - %04d : %d total posts across %d different categories;',
+                                                                                      $year,
+                                                                                      $posts->{ $year }->{ TOTAL },
+                                                                                      scalar keys %{ $posts->{ $year }->{ TAGS } };
+}
+
+
+
 say 'Generating CSV files ...' if ( $opts->verbose );
 for my $year ( reverse sort keys %$posts ){
     # avoid special keys
@@ -224,7 +239,8 @@ GNUPLOT
         $warning_year_in_progress = '(work in progress!)';
     }
     say {$stats} << "_STATS_";
-## $year $warning_year_in_progress
+
+### $year $warning_year_in_progress
 <b>$posts->{ $year }->{ TOTAL } posts</b> written in $year across $#keys different categories.
 <br/>
 Top <i>$top_categories_threshold</i> categories in <i>$year</i> are: <b>$top_categories</b>
@@ -238,6 +254,8 @@ _STATS_
 
 
 }
+
+
 
 
 
