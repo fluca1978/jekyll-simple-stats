@@ -217,7 +217,7 @@ GNUPLOT
     my $top_categories = join( ', ' , @keys[ 0 .. $top_categories_threshold ] );
     say {$stats} << "_STATS_";
 ## $year
-<b>$posts->{ $year }->{ TOTAL } posts</b> written in $year.
+<b>$posts->{ $year }->{ TOTAL } posts</b> written in $year across $#keys different categories.
 <br/>
 Top <i>$top_categories_threshold</i> categories in <i>$year</i> are: <b>$top_categories</b>
 
