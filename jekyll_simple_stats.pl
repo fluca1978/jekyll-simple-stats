@@ -90,6 +90,15 @@ $posts_directory   = File::Spec->rel2abs( $posts_directory );
 $images_directory  = File::Spec->rel2abs( $images_directory );
 $include_directory = File::Spec->rel2abs( $include_directory );
 
+# inform the user about running directories
+say <<"_DIR_";
+Running with the following directories:
+    posts to index => $posts_directory
+    graphs path    => $images_directory
+    include path   => $include_directory
+
+_DIR_
+
 # recompute the image relative directory in case it has been specified
 my $images_relative_directory = File::Spec->catdir( (File::Spec->splitdir( $images_directory ))[-2,-1]  );
 
