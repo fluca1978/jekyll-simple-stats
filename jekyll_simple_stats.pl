@@ -85,6 +85,11 @@ my $posts_directory   = $opts->posts  || File::Spec->catdir( $opts->home, '_post
 my $images_directory  = $opts->images || File::Spec->catdir( $opts->home, $images_relative_directory );
 my $include_directory = $opts->texts  || File::Spec->catdir( $opts->home, '_includes/' );
 
+# ensure all paths are absolute
+$posts_directory   = File::Spec->rel2abs( $posts_directory );
+$images_directory  = File::Spec->rel2abs( $images_directory );
+$include_directory = File::Spec->rel2abs( $include_directory );
+
 # recompute the image relative directory in case it has been specified
 $images_relative_directory = File::Spec->catdir( (File::Spec->splitdir( $images_directory ))[-1,-2]  );
 
