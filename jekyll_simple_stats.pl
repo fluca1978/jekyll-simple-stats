@@ -3,6 +3,7 @@ use v5.20;
 use File::Find;
 use Data::Dumper;
 use Getopt::Long::Descriptive;
+use File::Spec;
 
 # configure options and help
 my ($opts, $usage) = describe_options(
@@ -80,9 +81,9 @@ my $post_filter = sub {
 };
 
 my $images_relative_directory = 'images/graphs';
-my $posts_directory   = $opts->home . '/' . '_posts';
-my $images_directory  = $opts->home . '/' . $images_relative_directory;
-my $include_directory = $opts->home . '/' . '_includes/';
+my $posts_directory   = File::Spec->catdir( $opts->home, '_posts' );
+my $images_directory  = File::Spec->catdir( $opts->home, $images_relative_directory );
+my $include_directory = File::Spec->catdir( $opts->home, '_includes/' );
 
 
 # check arguments
@@ -92,7 +93,7 @@ for ( ( $opts->home, $posts_directory, $images_directory, $include_directory ) )
 
 
 my $top_tag_count = $opts->count || 10;
-my $include_stats_file = $include_directory . '/' . 'stats.html';
+my $include_stats_file = File::Spec->catfile( $include_directory, 'stats.html' );
 open my $stats, '>', $include_stats_file || die "\nCannot open $include_stats_file\n$!\n";
 
 
@@ -143,7 +144,7 @@ GNUPLOT
 
     close $gnuplot;
 
-    my $current_file_png = $images_directory . '/' . $year . '.png';
+    my $current_file_png = File::Spec->catfile( $images_directory, $year . '.png' );
     say "Generating image file $current_file_png" if ( $opts->verbose );
     `gnuplot $current_file_gnuplot > $current_file_png`;
     unlink $current_file_gnuplot;
@@ -178,7 +179,7 @@ plot "$current_file_csv"  using 2:xtic(1) title "" with boxes linecolor rgb "#bb
 GNUPLOT
     close $gnuplot;
 
-    my $current_tag_png = $images_directory . '/' . $year . '-tags.png';
+    my $current_tag_png = File::Spec->catfile( $images_directory,  $year . '-tags.png' );
     say "Generating image file $current_tag_png" if ( $opts->verbose );
     `gnuplot $current_file_gnuplot > $current_tag_png`;
     unlink $current_file_gnuplot;
