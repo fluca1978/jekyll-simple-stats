@@ -81,10 +81,12 @@ my $post_filter = sub {
 };
 
 my $images_relative_directory = 'images/graphs';
-my $posts_directory   = File::Spec->catdir( $opts->home, '_posts' );
-my $images_directory  = File::Spec->catdir( $opts->home, $images_relative_directory );
-my $include_directory = File::Spec->catdir( $opts->home, '_includes/' );
+my $posts_directory   = $opts->posts  || File::Spec->catdir( $opts->home, '_posts' );
+my $images_directory  = $opts->images || File::Spec->catdir( $opts->home, $images_relative_directory );
+my $include_directory = $opts->texts  || File::Spec->catdir( $opts->home, '_includes/' );
 
+# recompute the image relative directory in case it has been specified
+$images_relative_directory = File::Spec->catdir( (File::Spec->splitdir( $images_directory ))[-1,-2]  );
 
 # check arguments
 for ( ( $opts->home, $posts_directory, $images_directory, $include_directory ) ) {
