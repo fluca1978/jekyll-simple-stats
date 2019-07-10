@@ -244,5 +244,9 @@ say << "_HELP_" unless( $opts->quiet );
 
 All done!
 Remember to include the stats file with something like this:
+
     {% include stats.html %}
+
+in the file your are going to publish with Jekyll.
+Also remember to add changed graphs and stats to your git commit!
 _HELP_
