@@ -9,11 +9,11 @@ use File::Spec;
 my ($opts, $usage) = describe_options(
     "%c %o",
     [ 'home|h=s',   'local blog main folder, all other will be derived from here', { required => 1} ],
-    [ 'posts|d=s',  'posts directory (e.g., _posts)',                                               ],
+    [ 'posts|p=s',  'posts directory (e.g., _posts)',                                               ],
     [ 'images|i=s', 'images directory (e.g., images/graphs)',                                       ],
     [ 'texts|t=s',  'path to put text files in markdown (e.g., _include/stats/)',                   ],
     [ 'verbose|v',  'verbose output'                                                                ],
-    [ 'help',       'help output' , { shortcircuit => 1 }                                           ],
+    [ 'help',      'help output' , { shortcircuit => 1 }                                           ],
     [ 'count|c=s',  'tag count (default 10)' ,                                                      ],
     );
 
@@ -80,9 +80,9 @@ my $post_filter = sub {
     }
 };
 
-my $images_relative_directory = 'images/graphs';
+
 my $posts_directory   = $opts->posts  || File::Spec->catdir( $opts->home, '_posts' );
-my $images_directory  = $opts->images || File::Spec->catdir( $opts->home, $images_relative_directory );
+my $images_directory  = $opts->images || File::Spec->catdir( $opts->home, 'images/graphs' );
 my $include_directory = $opts->texts  || File::Spec->catdir( $opts->home, '_includes/' );
 
 # ensure all paths are absolute
@@ -91,7 +91,7 @@ $images_directory  = File::Spec->rel2abs( $images_directory );
 $include_directory = File::Spec->rel2abs( $include_directory );
 
 # recompute the image relative directory in case it has been specified
-$images_relative_directory = File::Spec->catdir( (File::Spec->splitdir( $images_directory ))[-2,-1]  );
+my $images_relative_directory = File::Spec->catdir( (File::Spec->splitdir( $images_directory ))[-2,-1]  );
 
 # check arguments
 for ( ( $opts->home, $posts_directory, $images_directory, $include_directory ) ) {
