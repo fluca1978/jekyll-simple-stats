@@ -49,3 +49,5 @@ Just open an issue or contact me.
 # Example on my personal web site
 
 See [my stats page](https://fluca1978.github.io/stats).
+
+See also [this blog post](https://fluca1978.github.io/2019/07/10/JekyllStatistics.html) about the rationale.
