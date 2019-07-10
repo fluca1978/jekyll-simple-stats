@@ -8,14 +8,15 @@ The idea is to be able to scan your local blog and produce some graphs to place 
 ## Synopsis
 
 ```shell
-jekyll_simple_stats.pl [-cdhitv] [long options...]
+jekyll_simple_stats.pl [-chipqtv] [long options...]
         -h STR --home STR    local blog main folder, all other will be
                              derived from here
-        -d STR --posts STR   posts directory (e.g., _posts)
+        -p STR --posts STR   posts directory (e.g., _posts)
         -i STR --images STR  images directory (e.g., images/graphs)
         -t STR --texts STR   path to put text files in markdown (e.g.,
                              _include/stats/)
         -v --verbose         verbose output
+        -q --quiet           quiet output (supress normal output)
         --help               help output
         -c STR --count STR   tag count (default 10)
 ```
