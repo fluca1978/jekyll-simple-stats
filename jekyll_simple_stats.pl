@@ -113,6 +113,9 @@ for ( ( $opts->home, $posts_directory, $images_directory, $include_directory ) )
 }
 
 
+# get the current year
+my $current_year = ( localtime() )[ 5 ] +  1900;
+
 my $top_tag_count = $opts->count || 10;
 my $include_stats_file = File::Spec->catfile( $include_directory, 'stats.html' );
 open my $stats, '>', $include_stats_file || die "\nCannot open $include_stats_file\n$!\n";
@@ -215,8 +218,13 @@ GNUPLOT
         ? $top_tag_count
         : $#keys - 1;
     my $top_categories = join( ', ' , @keys[ 0 .. $top_categories_threshold ] );
+
+    my $warning_year_in_progress = undef;
+    if ( $current_year == $year ){
+        $warning_year_in_progress = '(work in progress!)';
+    }
     say {$stats} << "_STATS_";
-## $year
+## $year $warning_year_in_progress
 <b>$posts->{ $year }->{ TOTAL } posts</b> written in $year across $#keys different categories.
 <br/>
 Top <i>$top_categories_threshold</i> categories in <i>$year</i> are: <b>$top_categories</b>
