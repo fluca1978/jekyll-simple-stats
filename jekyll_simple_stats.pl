@@ -140,6 +140,55 @@ for my $year ( reverse sort keys %$posts ){
 }
 
 
+# generate a categories overall graph
+{
+    say 'Generating main categories ...' if ( $opts->verbose );
+    my $current_file_csv = '/tmp/tags.csv';
+    my $current_file_gnuplot = '/tmp/tags.gnuplot';
+
+    open my $csv, '>', $current_file_csv || die "\nCannot produce data file $current_file_csv\n$!\n";
+    my $top = 0;
+    my @keys = sort  { $posts->{ TAGS }->{ $b } <=> $posts->{ TAGS }->{ $a } }
+                     keys %{ $posts->{ TAGS } };
+    # write only the top tags
+    for $_ ( @keys ){
+        say {$csv} "$_;$posts->{ TAGS }->{ $_ };";
+        $top++;
+        last if ( $top >= $top_tag_count );
+    }
+    close $csv;
+    open my $gnuplot, '>', $current_file_gnuplot || die "\nCannot produce plot file $current_file_gnuplot\n$!\n";
+    say {$gnuplot} << "GNUPLOT";
+#!env gnuplot
+reset
+set terminal png
+set title "Most Frequent Tags"
+set auto x
+set xlabel "Tag"
+set xtics rotate by 60 right
+set datafile separator ';'
+set ylabel "Posts"
+set style fill solid 1.0
+set boxwidth 0.9 relative
+plot "$current_file_csv"  using 2:xtic(1) title "" with boxes linecolor rgb "#bb00FF"
+GNUPLOT
+    close $gnuplot;
+
+    my $current_tag_png = File::Spec->catfile( $images_directory,  'tags.png' );
+    say "Generating image file $current_tag_png" if ( $opts->verbose );
+    `gnuplot $current_file_gnuplot > $current_tag_png`;
+    unlink $current_file_gnuplot;
+    unlink $current_file_csv;
+
+
+    say {$stats} << "_STATS_";
+<center>
+<img src="/$images_relative_directory/tags.png" />
+</center>
+_STATS_
+
+}
+
 
 say 'Generating CSV files ...' if ( $opts->verbose );
 for my $year ( reverse sort keys %$posts ){
