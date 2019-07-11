@@ -143,8 +143,8 @@ for my $year ( reverse sort keys %$posts ){
 # generate a categories overall graph
 {
     say 'Generating main categories ...' if ( $opts->verbose );
-    my $current_file_csv = '/tmp/tags.csv';
-    my $current_file_gnuplot = '/tmp/tags.gnuplot';
+    my $current_file_csv     = File::Spec->catfile( File::Spec->tmpdir(), 'tags.csv' );
+    my $current_file_gnuplot = File::Spec->catfile( File::Spec->tmpdir(), 'tags.gnuplot' );
 
     open my $csv, '>', $current_file_csv || die "\nCannot produce data file $current_file_csv\n$!\n";
     my $top = 0;
@@ -200,14 +200,14 @@ for my $year ( reverse sort keys %$posts ){
 
     say "$posts->{ $year }->{ TOTAL } total posts in $year" if ( $opts->verbose );
 
-    my $current_file_csv = "/tmp/data-$year.csv";
+    my $current_file_csv = File::Spec->catfile( File::Spec->tmpdir(), "$year.csv" );
     say "Generating data file $current_file_csv" if ( $opts->verbose );
     open my $csv, '>', $current_file_csv || die "\nCannot produce data file $current_file_csv\n$!\n";
     # write each line for the specific month
     say {$csv} "$_;$posts->{ $year }->{ STATS }->{ $_ };" for ( sort keys %{ $posts->{ $year }->{ STATS } } );
     close $csv;
 
-    my $current_file_gnuplot = "/tmp/data-$year.gnuplot";
+    my $current_file_gnuplot = File::Spec->catfile( File::Spec->tmpdir(), "$year.gnuplot" );
     say "Generating plot file $current_file_gnuplot" if ( $opts->verbose );
     open my $gnuplot, '>', $current_file_gnuplot || die "\nCannot produce plot file $current_file_gnuplot\n$!\n";
     say {$gnuplot} << "GNUPLOT";
