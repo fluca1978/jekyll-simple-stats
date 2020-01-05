@@ -147,6 +147,14 @@ for my $year ( reverse sort keys %$posts ){
     next if ( ! int( $year ) );
 
 
+    # autovivification of months that are not yeat produced:
+    # if the year is a work in progress, some months will not be available
+    # yet because they are in the future, so place them with a zero post
+    # count to allow the correct graph to show up
+    for my $current_month ( 1 .. 12 ){
+        my $yk = sprintf( '%04d-%02d', $year, $current_month );
+        $posts->{ $year }->{ STATS }->{ $yk } //= 0;
+    }
 
 
     say "$posts->{ $year }->{ TOTAL } total posts in $year" if ( $opts->verbose );
@@ -156,6 +164,8 @@ for my $year ( reverse sort keys %$posts ){
     open my $csv, '>', $current_file_csv || die "\nCannot produce data file $current_file_csv\n$!\n";
     # write each line for the specific month
     say {$csv} "$_;$posts->{ $year }->{ STATS }->{ $_ };" for ( sort keys %{ $posts->{ $year }->{ STATS } } );
+
+
     close $csv;
 
     my $current_file_gnuplot = "/tmp/data-$year.gnuplot";
@@ -165,18 +175,17 @@ for my $year ( reverse sort keys %$posts ){
 #!env gnuplot
 reset
 set terminal png
-
 set title "$year Post Ratio"
 set xlabel "Month"
 set xdata time
 set timefmt '%Y-%m'
-set format x "%b/%y" # Or some other output format you prefer
+set format x "%B (%Y)" 
 set xtics "$year-01", 7776000 rotate by 60 right
 set datafile separator ';'
 set ylabel "Number of Posts"
 set grid
 set style fill solid 1.0
-set boxwidth 0.9 relative
+set boxwidth 0.8 relative
 
 plot "$current_file_csv"  using 1:2 title "" with boxes linecolor rgb "#bb00FF"
 GNUPLOT
