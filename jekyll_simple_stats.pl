@@ -300,7 +300,7 @@ GNUPLOT
     # the minimum
     my $top_categories_threshold = $top_tag_count < $#keys
         ? $top_tag_count
-        : $#keys - 1;
+        : scalar @keys;
     my $top_categories = join( ', ' , @keys[ 0 .. $top_categories_threshold ] );
 
     my $warning_year_in_progress = undef;
