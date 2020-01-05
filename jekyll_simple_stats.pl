@@ -168,6 +168,7 @@ set xlabel "Tag"
 set xtics rotate by 60 right
 set datafile separator ';'
 set ylabel "Posts"
+set grid
 set style fill solid 1.0
 set boxwidth 0.9 relative
 plot "$current_file_csv"  using 2:xtic(1) title "" with boxes linecolor rgb "#bb00FF"
@@ -228,8 +229,9 @@ set title "$year Post Ratio"
 set xlabel "Month"
 set xdata time
 set timefmt '%Y-%m'
-set format x "%B (%Y)" 
-set xtics "$year-01", 7776000 rotate by 60 right
+set format x "%B (%Y)"
+set xrange ["$year-01":"$year-12"]
+set xtics "$year-01", 2592000 rotate by 60 right
 set datafile separator ';'
 set ylabel "Number of Posts"
 set grid
