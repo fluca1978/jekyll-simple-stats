@@ -140,6 +140,58 @@ for my $year ( reverse sort keys %$posts ){
 }
 
 
+
+# generate a per-year overall graph
+{
+    say 'Generating years ...' if ( $opts->verbose );
+    my $current_file_csv     = File::Spec->catfile( File::Spec->tmpdir(), 'years.csv' );
+    my $current_file_gnuplot = File::Spec->catfile( File::Spec->tmpdir(), 'years.gnuplot' );
+
+    open my $csv, '>', $current_file_csv || die "\nCannot produce data file $current_file_csv\n$!\n";
+
+    for my $year ( sort keys %$posts ){
+        next if ( ! int( $year ) );
+        say {$csv} sprintf '%04d;%d;',
+                                        $year,
+                                        $posts->{ $year }->{ TOTAL };
+    }
+
+    close $csv;
+
+    open my $gnuplot, '>', $current_file_gnuplot || die "\nCannot produce plot file $current_file_gnuplot\n$!\n";
+    say {$gnuplot} << "GNUPLOT";
+#!env gnuplot
+reset
+set terminal png
+set title "Post Ratio per-Year"
+set auto x
+set xlabel "Year"
+set xtics rotate by 60 right
+set datafile separator ';'
+set ylabel "Posts"
+set grid
+set style fill solid 1.0
+set boxwidth 0.9 relative
+plot "$current_file_csv"  using 2:xtic(1) title "" with boxes linecolor rgb "#bb00FF"
+GNUPLOT
+    close $gnuplot;
+
+    my $current_years_png = File::Spec->catfile( $images_directory,  'years.png' );
+    say "Generating image file $current_years_png" if ( $opts->verbose );
+    `gnuplot $current_file_gnuplot > $current_years_png`;
+    unlink $current_file_gnuplot;
+    unlink $current_file_csv;
+
+
+    say {$stats} << "_STATS_";
+<center>
+<img src="/$images_relative_directory/years.png" />
+</center>
+_STATS_
+
+}
+
+
 # generate a categories overall graph
 {
     say 'Generating main categories ...' if ( $opts->verbose );
