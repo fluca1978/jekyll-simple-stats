@@ -201,14 +201,25 @@ GNUPLOT
     # redo for the TAGS
     open my $csv, '>', $current_file_csv || die "\nCannot produce data file $current_file_csv\n$!\n";
     my $top = 0;
+
     my @keys = sort  { $posts->{ $year }->{ TAGS }->{ $b } <=> $posts->{ $year }->{ TAGS }->{ $a } }
-                     keys %{ $posts->{ $year }->{ TAGS } };
+    keys %{ $posts->{ $year }->{ TAGS } };
+
+
     # write only the top tags
     for $_ ( @keys ){
         say {$csv} "$_;$posts->{ $year }->{ TAGS }->{ $_ };";
         $top++;
         last if ( $top >= $top_tag_count );
     }
+
+    # in the case the number of tags is less than the required one, fill the graph
+    # with empty data
+    while ( $top < $top_tag_count ){
+        say {$csv} ";0;";
+        $top++;
+    }
+
     close $csv;
     open my $gnuplot, '>', $current_file_gnuplot || die "\nCannot produce plot file $current_file_gnuplot\n$!\n";
     say {$gnuplot} << "GNUPLOT";
