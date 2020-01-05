@@ -312,9 +312,9 @@ GNUPLOT
     say {$stats} << "_STATS_";
 
 ### $year $warning_year_in_progress
-<b>$posts->{ $year }->{ TOTAL } posts</b> written in $year across $#keys different categories.
+<b>$posts->{ $year }->{ TOTAL } posts</b> written in $year across @{[ scalar @keys ]} different categories.
 <br/>
-Top <i>$top_categories_threshold</i> categories in <i>$year</i> are: <b>$top_categories</b>
+Topmost <i>$top_categories_threshold</i> categories in <i>$year</i> are: <b>$top_categories</b>
 
 <center>
 <img src="/$images_relative_directory/$year.png" />
