@@ -162,9 +162,14 @@ class Year {
         join( ",\n\t\t", self.tags );
     }
 
+    method !is-current-year(){
+        my $now = DateTime.now;
+        return $now.year == $!year;
+    }
 
     method generate-markdown(){
         my $markdown = qq:to/_MD_/;
+        ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
         **{ self.count } total posts** have been written on { $!year }.
         There have been *{ self.count-tags } different tags* used, the most
         used popular being (in order of number of posts):
