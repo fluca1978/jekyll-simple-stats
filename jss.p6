@@ -23,9 +23,15 @@ class Post
     has Int $!year;
     has Int $!month;
 
+    submethod BUILD( IO::Path :$filename ) {
+        $!filename := $filename;
+        self!extract-info();
+    }
+
+
     # extract all the info
     # required to elaborate the statistics data
-    method extract-info(){
+    method !extract-info(){
         $!year  = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><year>.Int();
         $!month = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><month>.Int();
 
@@ -80,7 +86,7 @@ class Blog {
         say 'Inspecting the post directory...';
         for $!dir-posts.IO.dir() -> $post-file {
             my $post = Post.new( filename => $post-file );
-            $post.extract-info();
+#            $post.extract-info();
             say $post.year ~ ' --> ' ~ $post.month ~ ' ---===> ' ~ $post.tags;
         }
     }
