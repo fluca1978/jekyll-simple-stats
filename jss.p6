@@ -113,8 +113,11 @@ class Year {
     has %!tags-count;  # how many posts are there for a specific tag
     has Int $!year;
     has IO::Path $!filename;
+    has IO::Path $!graph-tags-filename;
+    has IO::Path $!graph-months-filename;
+    has IO::Path $!home-directory;
 
-    submethod BUILD( :@posts, :$year, :$directory ){
+    submethod BUILD( :@posts, :$year, :$directory, :$image-directory, :$home-directory ){
         $!year = $year;
 
         for @posts -> $post {
@@ -128,6 +131,9 @@ class Year {
         }
 
         $!filename = '%s/_%04d.md'.sprintf( $directory, $!year ).IO;
+        $!graph-tags-filename = '%s/_%04d-tags.png'.sprintf( $image-directory, $!year ).IO;
+        $!graph-months-filename = '%s/_%04d-months.png'.sprintf( $image-directory, $!year ).IO;
+        $!home-directory = $home-directory;
     }
 
     method year(){ $!year; }
@@ -170,6 +176,21 @@ class Year {
         return $now.year == $!year;
     }
 
+
+    method !graph-tags-url() {
+        my $url = $!graph-tags-filename;
+        my $home = $!home-directory;
+        $url ~~ s/$home//;
+        $url;
+    }
+
+    method !graph-months-url() {
+        my $url = $!graph-months-filename;
+        my $home = $!home-directory;
+        $url ~~ s/$home//;
+        $url;
+    }
+
     method generate-markdown(){
         my $markdown = qq:to/_MD_/;
         ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
@@ -182,7 +203,27 @@ class Year {
         }
 
         $markdown .= trim;
-        $markdown ~ '.';
+        $markdown  = $markdown ~ '.';
+
+
+        $markdown = $markdown ~ qq:to/_MD_/;
+        <br/>
+        <br/>
+        The following is overall post ratio on every { $!year } month:
+        <br/>
+            <center>
+              <img src="{ self!graph-months-url.Str }" alt="{ $!year } post ratio per month" />
+            </center>
+        <br/>
+
+        <br/>
+        The following is overall post ratio by tag:
+        <br/>
+          <center>
+            <img src="{ self!graph-tags-url.Str }" alt="{ $!year } post ratio per tag" />
+          </center>
+        <br/>
+        _MD_
 
 
         spurt $!filename, $markdown;
@@ -254,6 +295,8 @@ class Blog {
         for %posts-per-year.keys.sort -> $year {
             @years.push: Year.new: posts => @( %posts-per-year{ $year } ),
             year => $year.Int,
+            image-directory => $!dir-images,
+            home-directory => $!dir-home.IO,
             directory => $!dir-stats;
         }
 
