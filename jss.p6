@@ -112,8 +112,9 @@ class Year {
     has %!posts-count; # how many posts are there in every single month
     has %!tags-count;  # how many posts are there for a specific tag
     has Int $!year;
+    has IO::Path $!filename;
 
-    submethod BUILD( :@posts, :$year ){
+    submethod BUILD( :@posts, :$year, :$directory ){
         $!year = $year;
 
         for @posts -> $post {
@@ -125,6 +126,8 @@ class Year {
                 %!tags-count{ $tag }++;
             }
         }
+
+        $!filename = '%s/_%04d.md'.sprintf( $directory, $!year ).IO;
     }
 
     method year(){ $!year; }
@@ -181,7 +184,8 @@ class Year {
         $markdown .= trim;
         $markdown ~ '.';
 
-        say $markdown;
+
+        spurt $!filename, $markdown;
     }
 }
 
@@ -207,6 +211,14 @@ class Blog {
              Images in    [$!dir-images]
              Stats in     [$!dir-stats]
         _DIRS_
+    }
+
+
+    method generate-dirs-if-needed(){
+        my @dirs = ( $!dir-stats, $!dir-images );
+        for @dirs -> $dir {
+            $dir.IO.mkdir if ! $dir.IO.d;
+        }
     }
 
 
@@ -240,7 +252,9 @@ class Blog {
         }
 
         for %posts-per-year.keys.sort -> $year {
-            @years.push: Year.new: posts => @( %posts-per-year{ $year } ), year => $year.Int;
+            @years.push: Year.new: posts => @( %posts-per-year{ $year } ),
+            year => $year.Int,
+            directory => $!dir-stats;
         }
 
         return @years;
@@ -258,11 +272,12 @@ sub MAIN(
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
                               dir-posts => $jekyll-home ~ '/_posts',
-                              dir-stats => $jekyll-home ~ '/stats',
-                              dir-images => $jekyll-home ~ '/_include/stats' );
+                              dir-stats => $jekyll-home ~ '/_includes/stats',
+                              dir-images => $jekyll-home ~ '/images/stats' );
 
     # show what we have configured so far
     $blog.print-dirs();
+    $blog.generate-dirs-if-needed();
 
     # do the scan of the posts directory
     $blog.scan();
