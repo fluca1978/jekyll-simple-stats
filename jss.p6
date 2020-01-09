@@ -161,6 +161,23 @@ class Year {
         self.count-tags,
         join( ",\n\t\t", self.tags );
     }
+
+
+    method generate-markdown(){
+        my $markdown = qq:to/_MD_/;
+        **{ self.count } total posts** have been written on { $!year }.
+        There have been *{ self.count-tags } different tags* used, the most
+        used popular being (in order of number of posts):
+        _MD_
+        for self.tags -> $tag-pair {
+            $markdown = "%s \n- *%s* (%d posts) ".sprintf: $markdown, $tag-pair.key, $tag-pair.value;
+        }
+
+        $markdown .= trim;
+        $markdown ~ '.';
+
+        say $markdown;
+    }
 }
 
 
@@ -250,10 +267,7 @@ sub MAIN(
     for @years -> $year {
         # provide some output about this year
         say $year.Str;
-
-        # for $year.tags -> $tag {
-        #     say "{$tag.key} --- {$tag.value}";
-        # }
+        $year.generate-markdown;
     }
 }
 
