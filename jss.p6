@@ -130,9 +130,9 @@ class Year {
             }
         }
 
-        $!filename = '%s/_%04d.md'.sprintf( $directory, $!year ).IO;
-        $!graph-tags-filename = '%s/_%04d-tags.png'.sprintf( $image-directory, $!year ).IO;
-        $!graph-months-filename = '%s/_%04d-months.png'.sprintf( $image-directory, $!year ).IO;
+        $!filename = '%s/%04d.md'.sprintf( $directory, $!year ).IO;
+        $!graph-tags-filename = '%s/%04d-tags.png'.sprintf( $image-directory, $!year ).IO;
+        $!graph-months-filename = '%s/%04d-months.png'.sprintf( $image-directory, $!year ).IO;
         $!home-directory = $home-directory;
     }
 
@@ -307,6 +307,14 @@ class Year {
 
         spurt $!filename, $markdown;
     }
+
+
+    method jekyll-include-string(){
+        my $relative-filename = $!filename.basename.Str;
+        my $home = $!home-directory.Str;
+        $relative-filename ~~ s,$home\/,,;
+        '{%% include %s %%}'.sprintf: $relative-filename;
+    }
 }
 
 
@@ -411,6 +419,16 @@ sub MAIN(
         say $year.Str;
         $year.generate-markdown;
     }
+
+
+    say qq:to/_HELP_/;
+
+    All done, please check that your stat file on your blog has
+    all the following includes:
+    _HELP_
+
+        for @years  -> $year {
+        say "\t{ $year.jekyll-include-string }";
+    }
+
 }
-
-
