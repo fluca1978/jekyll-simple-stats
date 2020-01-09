@@ -230,8 +230,12 @@ class Year {
         my $gnuplot-file  = "/tmp/{$!year}-months.gnuplot";
 
         my $fh = open $csv-temp-file, :w;
-        for %!posts-count.pairs.sort( { $^a.key <=> $^b.key } ) -> $month-pair  {
-            $fh.say( '%04d-%02d;%d;'.sprintf( $!year, $month-pair.key, $month-pair.value ) );
+        # WARNING: need to iterate on all the months or 0-months will
+        # make gnuplot complain!
+        for 1..12 -> $month {
+            my $key = sprintf '%02d', $month;
+            my $count = %!posts-count{ $key } // 0;
+            $fh.say( '%04d-%02d;%d;'.sprintf( $!year, $key, $count ) );
         }
 
         $fh.close;
