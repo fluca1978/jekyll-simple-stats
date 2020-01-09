@@ -20,7 +20,7 @@ my regex rx_frontmatter_edge { ^ \- \- \- $ };
 my regex rx_post_title { ^ title\: \s+ $<title>=(.+)  $  }
 
 # A regex to match a single tag line
-my regex rx_post_single_tag { ^ \- \s+ $<tag>=\w+ $ }
+my regex rx_post_single_tag { ^ \- \s+ $<tag>=<[\w - ]>+ $ }
 
 # A post class represent the amount
 # of information required to generate a post
@@ -74,10 +74,10 @@ class Post
                     next;
                 }
 
-                if ( $tags-found && $line ~~ /^ \- \s+ $<tag>=\w+ / ) {
-                    @!tags.push: $/<tag>.Str.trim;
+                if ( $tags-found && $line ~~ /<rx_post_single_tag>/ ) {
+                    @!tags.push: $/<rx_post_single_tag><tag>.Str.trim.lc;
                 }
-                elsif ( $tags-found && $line ~~ /^\-\-\-$/ ) {
+                elsif ( $tags-found && $line ~~ /<rx_frontmatter_edge>/ ) {
                     last;
                 }
             } # end of the frontmatter within parsing
@@ -86,7 +86,7 @@ class Post
     }
 
     method year(){ $!year; }
-    method month(){ $!month; }
+    method month(){ '%02d'.sprintf: $!month; }
     method title(){ $!title }
 
     # Use to print out this post object.
@@ -103,6 +103,64 @@ class Post
         join( ', ', @!tags );
     }
 
+}
+
+# An Year class contains all the informations for the stats
+# of a single year, including the per-year and per-month stats.
+class Year {
+
+    has %!posts-count; # how many posts are there in every single month
+    has %!tags-count;  # how many posts are there for a specific tag
+    has Int $!year;
+
+    submethod BUILD( :@posts, :$year ){
+        $!year = $year;
+
+        for @posts -> $post {
+            # increase the number of the posts for the specified month
+            %!posts-count{ $post.month }++;
+
+            # increase the counts of the tags
+            for @( $post.tags ) -> $tag {
+                %!tags-count{ $tag }++;
+            }
+        }
+    }
+
+    method year(){ $!year; }
+
+    method count(){
+        my $sum = 0;
+        for %!posts-count.keys -> $month {
+            $sum += %!posts-count{ $month };
+        }
+
+        return $sum;
+    }
+
+    method count-tags() {
+        %!tags-count.keys.elems;
+    }
+
+    method count-per-month( Int $month ){
+        %!posts-count{ $month } ?? %!posts-count{ $month } !! 0;
+    }
+
+    # Returns a list of Pair objects, where the key is the tag name
+    # and the value is the post count.
+    method tags( Int $limit = 10){
+        my @tags =  %!tags-count.pairs.sort( { $^b.value <=> $^a.value } );
+        return @tags[ 0..$limit ];
+    }
+
+
+    method Str {
+        "%04d\n\t%d total posts\n\t%d total tags\n\tMain tags:\n\t\t%s".sprintf:
+        $!year,
+        self.count,
+        self.count-tags,
+        join( ",\n\t\t", self.tags );
+    }
 }
 
 
@@ -139,6 +197,32 @@ class Blog {
 
         say "Found { @!posts.elems } posts";
     }
+
+    method posts-as-hash() {
+        my %posts-per-year;
+
+        for @!posts -> $post {
+            %posts-per-year{ $post.year }{ $post.month }.push: $post;
+        }
+
+        return %posts-per-year;
+    }
+
+
+    method generate-years(){
+        my Year @years;
+        my %posts-per-year;
+
+        for @!posts -> $post {
+            %posts-per-year{ $post.year }.push: $post;
+        }
+
+        for %posts-per-year.keys.sort -> $year {
+            @years.push: Year.new: posts => @( %posts-per-year{ $year } ), year => $year.Int;
+        }
+
+        return @years;
+    }
 }
 
 
@@ -160,6 +244,17 @@ sub MAIN(
 
     # do the scan of the posts directory
     $blog.scan();
+
+    # do generate all stats data divided by year
+    my @years = $blog.generate-years;
+    for @years -> $year {
+        # provide some output about this year
+        say $year.Str;
+
+        # for $year.tags -> $tag {
+        #     say "{$tag.key} --- {$tag.value}";
+        # }
+    }
 }
 
 
