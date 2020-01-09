@@ -191,7 +191,42 @@ class Year {
         $url;
     }
 
+
+    method !generate-tags-graph(){
+        my $csv-temp-file = "/tmp/{$!year}-tags.csv";
+        my $gnuplot-file  = "/tmp/{$!year}-tags.gnuplot";
+
+        my $fh = open $csv-temp-file, :w;
+        for self.tags -> $tag-pair {
+            $fh.say( '%s;%d;'.sprintf( $tag-pair.key, $tag-pair.value ) );
+        }
+
+        $fh.close;
+
+        my $gnuplot = qq:to/_GNUPLOT_/;
+        #!env gnuplot
+        reset
+        set terminal png
+        set title "{ $!year } Most Frequent Tags"
+        set auto x
+        set xlabel "Tag"
+        set xtics rotate by 60 right
+        set datafile separator ';'
+        set ylabel "Posts"
+        set style fill solid 1.0
+        set boxwidth 0.9 relative
+        plot "$csv-temp-file"  using 2:xtic(1) title "" with boxes linecolor rgb "#bb00FF"
+        _GNUPLOT_
+
+        spurt $gnuplot-file, $gnuplot;
+
+        # now run gnuplot
+        shell "gnuplot $gnuplot-file > $!graph-tags-filename";
+    }
+
     method generate-markdown(){
+        self!generate-tags-graph;
+
         my $markdown = qq:to/_MD_/;
         ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
         **{ self.count } total posts** have been written on { $!year }.
