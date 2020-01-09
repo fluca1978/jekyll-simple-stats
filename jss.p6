@@ -224,8 +224,48 @@ class Year {
         shell "gnuplot $gnuplot-file > $!graph-tags-filename";
     }
 
+
+    method !generate-months-graph(){
+        my $csv-temp-file = "/tmp/{$!year}-months.csv";
+        my $gnuplot-file  = "/tmp/{$!year}-months.gnuplot";
+
+        my $fh = open $csv-temp-file, :w;
+        for %!posts-count.pairs.sort( { $^a.key <=> $^b.key } ) -> $month-pair  {
+            $fh.say( '%04d-%02d;%d;'.sprintf( $!year, $month-pair.key, $month-pair.value ) );
+        }
+
+        $fh.close;
+
+        my $gnuplot = qq:to/_GNUPLOT_/;
+        #!env gnuplot
+        reset
+        set terminal png
+        set title "{ $!year } Post Ratio"
+        set xlabel "Month"
+        set xdata time
+        set timefmt '%Y-%m'
+        set format x "%B (%Y)"
+        set xrange ["{ $!year }-01":"{ $!year }-12"]
+        set xtics "{ $!year }-01", 2592000 rotate by 60 right
+        set datafile separator ';'
+        set ylabel "Number of Posts"
+        set grid
+        set style fill solid 1.0
+        set boxwidth 0.8 relative
+        plot "$csv-temp-file"  using 1:2 title "" with boxes linecolor rgb "#bb00FF"
+        _GNUPLOT_
+
+        spurt $gnuplot-file, $gnuplot;
+
+        # now run gnuplot
+        shell "gnuplot $gnuplot-file > $!graph-months-filename";
+    }
+
+
+
     method generate-markdown(){
         self!generate-tags-graph;
+        self!generate-months-graph;
 
         my $markdown = qq:to/_MD_/;
         ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
