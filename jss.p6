@@ -134,8 +134,10 @@ class Blog {
         say 'Inspecting the post directory...';
         for $!dir-posts.IO.dir() -> $post-file {
             my $post = Post.new( filename => $post-file );
-            say $post.Str;
+            @!posts.push: $post;
         }
+
+        say "Found { @!posts.elems } posts";
     }
 }
 
