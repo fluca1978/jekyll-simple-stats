@@ -36,6 +36,11 @@ class Post
         $!month = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><month>.Int();
 
         # extract the tags
+        self!extract-tags();
+    }
+
+    # A method to parse the tags of the post content.
+    method !extract-tags(){
         my $tags-found = False;
         for $!filename.IO.lines -> $line {
             if ( ! $tags-found && $line ~~ /^tags:/ ) {
