@@ -12,6 +12,16 @@
 # that is done with yyyy-mm-dd-title
 my regex rx_post_filename { ^ $<year>=\d ** 4 \- $<month>=\d ** 2 \- $<day>=\d ** 2 };
 
+# A regex to match the begin and end of the Markdown Frontmatter stuff.
+my regex rx_frontmatter_edge { ^ \- \- \- $ };
+
+# A regex to match a title in the markdown part
+#my regex rx_post_title { ^ title\: \s+ <["|']>? $<title>=(.*) <["|']>? $  }
+my regex rx_post_title { ^ title\: \s+ $<title>=(.+)  $  }
+
+# A regex to match a single tag line
+my regex rx_post_single_tag { ^ \- \s+ $<tag>=\w+ $ }
+
 # A post class represent the amount
 # of information required to generate a post
 # statistic data.
@@ -22,6 +32,7 @@ class Post
 
     has Int $!year;
     has Int $!month;
+    has Str $!title;
 
     submethod BUILD( IO::Path :$filename ) {
         $!filename := $filename;
@@ -36,30 +47,62 @@ class Post
         $!month = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><month>.Int();
 
         # extract the tags
-        self!extract-tags();
+        self!extract-tags-and-title();
     }
 
     # A method to parse the tags of the post content.
-    method !extract-tags(){
+    method !extract-tags-and-title(){
         my $tags-found = False;
+        my $front-matter-found = False;
         for $!filename.IO.lines -> $line {
-            if ( ! $tags-found && $line ~~ /^tags:/ ) {
-                $tags-found = True;
-                redo;
+            if ! $front-matter-found && $line.match( /<rx_frontmatter_edge>/ )  {
+                $front-matter-found = True;
+                next;
             }
 
-            if ( $tags-found && $line ~~ /^ \- \s+ $<tag>=\w+ / ) {
-                @!tags.push: $/<tag>.Str;
-            }
-            elsif ( $tags-found && $line ~~ /^\-\-\-$/ ) {
-                last;
-            }
+            if $front-matter-found {
+
+                # got the post title?
+                if $line.match( /<rx_post_title>/ ) {
+                    $!title = $/<rx_post_title><title>.Str.subst( /<["|']>/, '', :g ).trim();
+                    next;
+                }
+
+
+                if ( ! $tags-found && $line ~~ /^tags:/ ) {
+                    $tags-found = True;
+                    next;
+                }
+
+                if ( $tags-found && $line ~~ /^ \- \s+ $<tag>=\w+ / ) {
+                    @!tags.push: $/<tag>.Str.trim;
+                }
+                elsif ( $tags-found && $line ~~ /^\-\-\-$/ ) {
+                    last;
+                }
+            } # end of the frontmatter within parsing
 
         }
     }
 
     method year(){ $!year; }
     method month(){ $!month; }
+    method title(){ $!title }
+
+    # Use to print out this post object.
+    # Examples:
+    #
+    # say $post.Str;
+    # print $post;
+    method Str(){
+        "⤷ %s\n\t%04d-%02d\n\tTitle: [%s]\n\tTags: [%s]".sprintf:
+        $!filename.basename,
+        $!year,
+        $!month,
+        $!title,
+        join( ', ', @!tags );
+    }
+
 }
 
 
@@ -91,8 +134,7 @@ class Blog {
         say 'Inspecting the post directory...';
         for $!dir-posts.IO.dir() -> $post-file {
             my $post = Post.new( filename => $post-file );
-#            $post.extract-info();
-            say $post.year ~ ' --> ' ~ $post.month ~ ' ---===> ' ~ $post.tags;
+            say $post.Str;
         }
     }
 }
