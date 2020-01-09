@@ -28,6 +28,23 @@ class Post
     method extract-info(){
         $!year  = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><year>.Int();
         $!month = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><month>.Int();
+
+        # extract the tags
+        my $tags-found = False;
+        for $!filename.IO.lines -> $line {
+            if ( ! $tags-found && $line ~~ /^tags:/ ) {
+                $tags-found = True;
+                redo;
+            }
+
+            if ( $tags-found && $line ~~ /^ \- \s+ $<tag>=\w+ / ) {
+                @!tags.push: $/<tag>.Str;
+            }
+            elsif ( $tags-found && $line ~~ /^\-\-\-$/ ) {
+                last;
+            }
+
+        }
     }
 
     method year(){ $!year; }
@@ -64,7 +81,7 @@ class Blog {
         for $!dir-posts.IO.dir() -> $post-file {
             my $post = Post.new( filename => $post-file );
             $post.extract-info();
-            say $post.year ~ ' --> ' ~ $post.month;
+            say $post.year ~ ' --> ' ~ $post.month ~ ' ---===> ' ~ $post.tags;
         }
     }
 }
