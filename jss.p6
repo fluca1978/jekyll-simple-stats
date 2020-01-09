@@ -20,11 +20,18 @@ class Post
     has IO::Path $.filename;
     has Str @.tags;
 
+    has Int $!year;
+    has Int $!month;
 
-    # extract the year from the filename
-    method year(){ $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><year>; }
-    # extract the month from the filename
-    method month(){ $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><month>; }
+    # extract all the info
+    # required to elaborate the statistics data
+    method extract-info(){
+        $!year  = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><year>.Int();
+        $!month = $!filename.basename.match( /<rx_post_filename>/ )<rx_post_filename><month>.Int();
+    }
+
+    method year(){ $!year; }
+    method month(){ $!month; }
 }
 
 
@@ -56,6 +63,7 @@ class Blog {
         say 'Inspecting the post directory...';
         for $!dir-posts.IO.dir() -> $post-file {
             my $post = Post.new( filename => $post-file );
+            $post.extract-info();
             say $post.year ~ ' --> ' ~ $post.month;
         }
     }
