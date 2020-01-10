@@ -274,7 +274,6 @@ class Year {
         self!generate-months-graph;
 
         my $markdown = qq:to/_MD_/;
-
         ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
 
         **{ self.count } total posts** have been written on { $!year }.
@@ -428,11 +427,11 @@ sub MAIN(
     say qq:to/_HELP_/;
 
     All done, please check that your stat file on your blog has
-    all the following includes:
+    all the following includes (without any leading space!):
     _HELP_
 
         for @years.reverse  -> $year {
-        say "\t{ $year.jekyll-include-string }";
+        say "{ $year.jekyll-include-string }";
     }
 
 }
