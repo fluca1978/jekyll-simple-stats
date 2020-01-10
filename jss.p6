@@ -113,6 +113,7 @@ class Year {
     has %!tags-count;  # how many posts are there for a specific tag
     has Int $!year;
     has IO::Path $!filename;
+    has IO::Path $!include-directory;
     has IO::Path $!graph-tags-filename;
     has IO::Path $!graph-months-filename;
     has IO::Path $!home-directory;
@@ -130,7 +131,8 @@ class Year {
             }
         }
 
-        $!filename = '%s/%04d.md'.sprintf( $directory, $!year ).IO;
+        $!include-directory = $directory.IO;
+        $!filename = '%s/%04d.md'.sprintf( $!include-directory, $!year ).IO;
         $!graph-tags-filename = '%s/%04d-tags.png'.sprintf( $image-directory, $!year ).IO;
         $!graph-months-filename = '%s/%04d-months.png'.sprintf( $image-directory, $!year ).IO;
         $!home-directory = $home-directory;
@@ -272,7 +274,9 @@ class Year {
         self!generate-months-graph;
 
         my $markdown = qq:to/_MD_/;
+
         ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
+
         **{ self.count } total posts** have been written on { $!year }.
         There have been *{ self.count-tags } different tags* used, the most
         used popular being (in order of number of posts):
@@ -310,9 +314,9 @@ class Year {
 
 
     method jekyll-include-string(){
-        my $relative-filename = $!filename.basename.Str;
-        my $home = $!home-directory.Str;
-        $relative-filename ~~ s,$home\/,,;
+        # must be a path relative to the include dir!
+        my @parts = $!filename.path.split( '/' ).reverse;
+        my $relative-filename = '%s/%s'.sprintf: @parts[ 1 ], @parts[ 0 ];
         '{%% include %s %%}'.sprintf: $relative-filename;
     }
 }
@@ -427,7 +431,7 @@ sub MAIN(
     all the following includes:
     _HELP_
 
-        for @years  -> $year {
+        for @years.reverse  -> $year {
         say "\t{ $year.jekyll-include-string }";
     }
 
