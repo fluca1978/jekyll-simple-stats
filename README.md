@@ -1,9 +1,62 @@
 # Jekyll Simple Statistic Generator
 
-This repository contains a *quick and dirt* Perl 5 script to generate some blog post activity counting.
-The idea is to be able to scan your local blog and produce some graphs to place into it by including an automatically generated piece of HTML.
+This repository contains a couple of Perl applications to quickly generate some statistical information about the blog activity, supposing of course you use Jekyll as a blog engine.
 
+In the beginning there was only a Perl 5 script, then on January 2020 I decided to rewrite it in Perl 6. The two scripts are not the same, they act slightly differently, but chances are the Perl 5 one will no more be mantained.
 
+## Main Differences Between the Versions
+
+The Perl 5 script generates a single file to be included into your Jekyll page to show the stats; on the other hand, the Raku script generates a file per year to be included. While this requires a little more manual tweak, it provides more modularity.
+
+The Perl 5 script provides, so far, more options to instrument the script, however the Raku one is OOP and is much more consistent in the file and directory naming.
+
+The script names are different: the Raku script has a shorter name `jss.p6`, while the Perl 5 script has a verbose name `jekyll_simple_stats.pl`.
+
+# The Raku Script
+
+## Synopsis
+
+```shell
+% perl6 jss.p6 --jekyll-home=<where is your blog>
+```
+
+## Usage
+
+The mandatory argument `jekyll-home` must be specified as the path to your local Jekyll directory.
+The script will inspect the `_posts` subdirectory looking for posts and will organize them into a few data structures:
+- a `Post` object for every text file will be produced, such object contains the title, the tags and the year and month of the post;
+- `Post`s will be grouped into an `Year` object, that is able to graph them by month and tag;
+- a `Blog` object is the entry point for the application and is responsible for creating the former two objects.
+
+The data structures could change in the future.
+
+At the end of the execution, the script will produce a message telling you which files must be included:
+```shell
+All done, please check that your stat file on your blog has
+all the following includes (without any leading space!):
+
+{% include stats/2020.md %}
+{% include stats/2019.md %}
+{% include stats/2018.md %}
+{% include stats/2017.md %}
+{% include stats/2016.md %}
+{% include stats/2015.md %}
+{% include stats/2014.md %}
+{% include stats/2013.md %}
+{% include stats/2012.md %}
+{% include stats/2011.md %}
+{% include stats/2010.md %}
+{% include stats/2009.md %}
+{% include stats/2008.md %}
+```
+
+The output could be different depending on your post ratio and years.
+
+The script will generate the following files:
+- images files into your Jekyll home, folder `images/stats`, two PNG files per year (e.g., `2008-tags.png`, `2008-months.png`);
+- text file (in markdown format) into your Jekyll home, folder `_includes/stats/_`, one per year (e.g., `2008.md`).
+
+# The Perl 5 Script
 
 ## Synopsis
 
