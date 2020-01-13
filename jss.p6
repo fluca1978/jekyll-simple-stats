@@ -315,8 +315,8 @@ class Year {
 
     method jekyll-include-string(){
         # must be a path relative to the include dir!
-        my @parts = $!filename.path.split( '/' ).reverse;
-        my $relative-filename = '%s/%s'.sprintf: @parts[ 1 ], @parts[ 0 ];
+        my ( $dir, $file ) = $!filename.path.split( '/' ).reverse[ 1, 0 ];
+        my $relative-filename = $dir.IO.add( $file );
         '{%% include %s %%}'.sprintf: $relative-filename;
     }
 }
