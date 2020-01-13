@@ -132,9 +132,10 @@ class Year {
         }
 
         $!include-directory = $directory.IO;
-        $!filename = '%s/%04d.md'.sprintf( $!include-directory, $!year ).IO;
-        $!graph-tags-filename = '%s/%04d-tags.png'.sprintf( $image-directory, $!year ).IO;
-        $!graph-months-filename = '%s/%04d-months.png'.sprintf( $image-directory, $!year ).IO;
+        # create all other IO objects
+        $!filename = $!include-directory.add( "{$!year}.md" );  # something like _includes/stats/2020.md
+        $!graph-tags-filename   = $image-directory.IO.add( "{$!year}-tags.png" ); # e.g., imgaes/2020-tags.png
+        $!graph-months-filename = $image-directory.IO.add( "{$!year}-months.png" ); # e.g., images/2020-months.png
         $!home-directory = $home-directory;
     }
 
