@@ -251,7 +251,7 @@ class Year {
         set xlabel "Month"
         set xdata time
         set timefmt '%Y-%m'
-        set format x "%B (%Y)"
+        set format x "%B"
         set xrange ["{ $!year }-01":"{ $!year }-12"]
         set xtics "{ $!year }-01", 2592000 rotate by 60 right
         set datafile separator ';'
