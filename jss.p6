@@ -292,7 +292,7 @@ class Year {
         $markdown = $markdown ~ qq:to/_MD_/;
         <br/>
         <br/>
-        The following is overall post ratio on every { $!year } month:
+        The following is the overall { $!year } post ratio by month:
         <br/>
             <center>
               <img src="{ self!graph-months-url.Str }" alt="{ $!year } post ratio per month" />
@@ -300,7 +300,7 @@ class Year {
         <br/>
 
         <br/>
-        The following is overall post ratio by tag:
+        The following is the overall { $!year } post ratio by tag:
         <br/>
           <center>
             <img src="{ self!graph-tags-url.Str }" alt="{ $!year } post ratio per tag" />
