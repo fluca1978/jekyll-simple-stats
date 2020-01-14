@@ -225,6 +225,10 @@ class Year {
 
         # now run gnuplot
         shell "gnuplot $gnuplot-file > $!graph-tags-filename";
+
+        # remove the files
+        $csv-temp-file.IO.unlink;
+        $gnuplot-file.IO.unlink;
     }
 
 
@@ -266,6 +270,10 @@ class Year {
 
         # now run gnuplot
         shell "gnuplot $gnuplot-file > $!graph-months-filename";
+
+        # remove the files
+        $csv-temp-file.IO.unlink;
+        $gnuplot-file.IO.unlink;
     }
 
 
