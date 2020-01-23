@@ -397,9 +397,9 @@ class Blog {
     # Provides all the posts in a specified year.
     # If no year is provided, all the posts are returned.
     method get-posts( Int :$year? ) {
-        @!posts if ! $year;
-        Nil if $year > $!year-max || $year < $!year-min;
-        @!posts.grep( { .year == $year } ) if $year;
+        return @!posts if ! $year;
+        return Nil if $year > $!year-max || $year < $!year-min;
+        return @!posts.grep( { .year == $year } ) if $year;
     }
 
 
@@ -407,10 +407,11 @@ class Blog {
         my $now = DateTime.now( formatter =>
                                 { '%s at %d:%02d'.sprintf: .yyyy-mm-dd, .hour, .minute } );
         my $md = qq:to/_MD_/;
+        <small>
         The graphs and statistical data have been generated on
         $now
         by the Raku
-        script { $*PROGRAM.IO.basename } running on $*PERL via $*VM.
+        script  { $*PROGRAM.IO.basename } running on $*PERL via $*VM.
         <br/>
         See <a href="https://github.com/fluca1978/jekyll-simple-stats" target="_new">
                <i>Jekyll Simple Stats</i>
@@ -419,6 +420,7 @@ class Blog {
             by Luca Ferrari
         </a>
         .
+        </small>
         _MD_
 
         # output the file
