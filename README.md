@@ -25,7 +25,7 @@ The script names are different: the Raku script has a shorter name `jss.p6`, whi
 The mandatory argument `jekyll-home` must be specified as the path to your local Jekyll directory.
 The script will inspect the `_posts` subdirectory looking for posts and will organize them into a few data structures:
 - a `Post` object for every text file will be produced, such object contains the title, the tags and the year and month of the post;
-- `Post`s will be grouped into an `Year` object, that is able to graph them by month and tag;
+- `Post`s will be grouped into a `Stat` object, that is able to graph them by month and tag;
 - a `Blog` object is the entry point for the application and is responsible for creating the former two objects.
 
 The data structures could change in the future.

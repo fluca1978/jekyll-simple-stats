@@ -105,9 +105,9 @@ class Post
 
 }
 
-# An Year class contains all the informations for the stats
+# A Stat class contains all the informations for the stats
 # of a single year, including the per-year and per-month stats.
-class Year {
+class Stat {
 
     has %!posts-count; # how many posts are there in every single month
     has %!tags-count;  # how many posts are there for a specific tag
@@ -118,7 +118,9 @@ class Year {
     has IO::Path $!graph-months-filename;
     has IO::Path $!home-directory;
 
-    submethod BUILD( :@posts, :$year, :$directory, :$image-directory, :$home-directory ){
+    submethod BUILD( :@posts,
+                     Int :$year,
+                     :$blog ){
         $!year = $year;
 
         for @posts -> $post {
@@ -131,12 +133,12 @@ class Year {
             }
         }
 
-        $!include-directory = $directory.IO;
+        $!include-directory = $blog.dir-stats.IO;
         # create all other IO objects
         $!filename = $!include-directory.add( "{$!year}.md" );  # something like _includes/stats/2020.md
-        $!graph-tags-filename   = $image-directory.IO.add( "{$!year}-tags.png" ); # e.g., imgaes/2020-tags.png
-        $!graph-months-filename = $image-directory.IO.add( "{$!year}-months.png" ); # e.g., images/2020-months.png
-        $!home-directory = $home-directory;
+        $!graph-tags-filename   = $blog.dir-images.IO.add( "{$!year}-tags.png" ); # e.g., imgaes/2020-tags.png
+        $!graph-months-filename = $blog.dir-images.IO.add( "{$!year}-months.png" ); # e.g., images/2020-months.png
+        $!home-directory = $blog.dir-home.IO;
     }
 
     method year(){ $!year; }
@@ -342,6 +344,9 @@ class Blog {
 
     has Post @.posts;       # a list of posts
 
+    # range of years for the whole blog
+    has Int ( $.year-min, $.year-max );
+
     # An info method to display the content
     # of this blog object.
     method print-dirs(){
@@ -366,10 +371,16 @@ class Blog {
         say 'Inspecting the post directory...';
         for $!dir-posts.IO.dir() -> $post-file {
             my $post = Post.new( filename => $post-file );
+
+            # is this post changing the years boundaries?
+            $!year-min = $post.year if ! $!year-min || $post.year < $!year-min;
+            $!year-max = $post.year if ! $!year-max || $post.year > $!year-max;
+
+            # store it in the list
             @!posts.push: $post;
         }
 
-        say "Found { @!posts.elems } posts";
+        say "Found { @!posts.elems } posts between years $!year-min and $!year-max";
     }
 
     method posts-as-hash() {
@@ -382,24 +393,13 @@ class Blog {
         return %posts-per-year;
     }
 
-
-    method generate-years(){
-        my Year @years;
-        my %posts-per-year;
-
-        for @!posts -> $post {
-            %posts-per-year{ $post.year }.push: $post;
-        }
-
-        for %posts-per-year.keys.sort -> $year {
-            @years.push: Year.new: posts => @( %posts-per-year{ $year } ),
-            year => $year.Int,
-            image-directory => $!dir-images,
-            home-directory => $!dir-home.IO,
-            directory => $!dir-stats;
-        }
-
-        return @years;
+    #
+    # Provides all the posts in a specified year.
+    # If no year is provided, all the posts are returned.
+    method get-posts( Int :$year? ) {
+        @!posts if ! $year;
+        Nil if $year > $!year-max || $year < $!year-min;
+        @!posts.grep( { .year == $year } ) if $year;
     }
 }
 
@@ -424,23 +424,29 @@ sub MAIN(
     # do the scan of the posts directory
     $blog.scan();
 
-    # do generate all stats data divided by year
-    my @years = $blog.generate-years;
-    for @years -> $year {
-        # provide some output about this year
-        say $year.Str;
-        $year.generate-markdown;
+    # now scan across the years
+    my @include-instructions;
+    for $blog.year-min .. $blog.year-max {
+        my $stat = Stat.new: posts => $blog.get-posts( :year( $_ ) ),
+        year => $_,
+        blog => $blog;
+
+        $stat.Str.say;
+
+        # generate the files for this year
+        $stat.generate-markdown;
+
+        # store the include instructions
+        @include-instructions.push: $stat;
     }
-
-
     say qq:to/_HELP_/;
 
     All done, please check that your stat file on your blog has
     all the following includes (without any leading space!):
     _HELP_
 
-        for @years.reverse  -> $year {
-        say "{ $year.jekyll-include-string }";
+        for @include-instructions.reverse {
+           say "{ .jekyll-include-string }";
     }
 
 }
