@@ -401,6 +401,32 @@ class Blog {
         Nil if $year > $!year-max || $year < $!year-min;
         @!posts.grep( { .year == $year } ) if $year;
     }
+
+
+    method generate-markdown-credits {
+        my $now = DateTime.now( formatter =>
+                                { '%s at %d:%02d'.sprintf: .yyyy-mm-dd, .hour, .minute } );
+        my $md = qq:to/_MD_/;
+        The graphs and statistical data have been generated on
+        $now
+        by the Raku
+        script { $*PROGRAM.IO.basename } running on $*PERL via $*VM.
+        <br/>
+        See <a href="https://github.com/fluca1978/jekyll-simple-stats" target="_new">
+               <i>Jekyll Simple Stats</i>
+            </a>
+        <a href="https://fluca1978.github.io" target="_new">
+            by Luca Ferrari
+        </a>
+        .
+        _MD_
+
+        # output the file
+        my $credits-file = $!dir-stats.IO.add( 'credits.md' );
+        $credits-file.spurt: $md;
+
+        return '{%% include %s/%s %%}'.sprintf: $credits-file.path.split( '/' ).reverse[ 1, 0 ];
+    }
 }
 
 
@@ -437,16 +463,18 @@ sub MAIN(
         $stat.generate-markdown;
 
         # store the include instructions
-        @include-instructions.push: $stat;
+        @include-instructions.push: $stat.jekyll-include-string;
     }
+
+    @include-instructions.unshift: $blog.generate-markdown-credits;
+
+
     say qq:to/_HELP_/;
 
     All done, please check that your stat file on your blog has
     all the following includes (without any leading space!):
     _HELP_
 
-        for @include-instructions.reverse {
-           say "{ .jekyll-include-string }";
-    }
+    @include-instructions.reverse.join( "\n" ).say;
 
 }
