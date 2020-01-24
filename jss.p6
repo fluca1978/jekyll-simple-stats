@@ -303,6 +303,10 @@ class Stat {
         $markdown  = $markdown ~ '.';
 
 
+        my $now = DateTime.now( formatter =>
+                                { '%s at %d:%02d'.sprintf: .yyyy-mm-dd, .hour, .minute } );
+
+
         $markdown = $markdown ~ qq:to/_MD_/;
         <br/>
         <br/>
@@ -319,6 +323,10 @@ class Stat {
           <center>
             <img src="{ self!graph-tags-url.Str }" alt="{ $!year } post ratio per tag" />
           </center>
+        <br/>
+        <small>
+        Last generated on { $now.Str }
+        </small>
         <br/>
         _MD_
 
@@ -449,7 +457,7 @@ sub MAIN(
     where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
 
     , Int :$year?
-          where { $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
+#          where { $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
 )
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
