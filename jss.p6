@@ -127,6 +127,7 @@ class Stat {
         $!year = $year;
 
         for @posts -> $post {
+            next if $post !~~ Post;
             # increase the number of the posts for the specified month
             %!posts-count{ $post.month }++;
 
@@ -406,7 +407,7 @@ class Blog {
     # If no year is provided, all the posts are returned.
     method get-posts( Int :$year? ) {
         return @!posts if ! $year;
-        return Nil if $year > $!year-max || $year < $!year-min;
+        return () if $year > $!year-max || $year < $!year-min;
         return @!posts.grep( { .year == $year } ) if $year;
     }
 
@@ -466,7 +467,13 @@ sub MAIN(
     # now scan across the years
     my @include-instructions;
     for $blog.year-min .. $blog.year-max {
-        my $stat = Stat.new: posts => $blog.get-posts( :year( $_ ) ),
+
+        my @current-posts = $blog.get-posts( :year( $_ ) );
+
+        # skip all the things if there are no post in this year
+        next if ! @current-posts;
+
+        my $stat = Stat.new: posts => @current-posts ,
         year => $_,
         blog => $blog;
 
