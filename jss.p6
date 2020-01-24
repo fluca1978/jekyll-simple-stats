@@ -446,7 +446,7 @@ class Blog {
 
 sub MAIN(
     Str :$jekyll-home
-    where { .IO.d // die "Please specify a home directory [$jekyll-home]" }
+    where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
 
     , Int :$year?
           where { $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
