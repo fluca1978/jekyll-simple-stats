@@ -485,4 +485,17 @@ sub MAIN(
 
     @include-instructions.reverse.join( "\n" ).say;
 
+    if $year {
+        say qq:to/_EXTRA_HELP_/;
+
+        ===================================================================
+        WARNING: please note that you asked to generate only the year $year
+        so there could be other years not included in this generation. Make sure
+        your statistic data and included files are all in place and provide
+        the result you want!
+        ===================================================================
+
+        _EXTRA_HELP_
+    }
+
 }
