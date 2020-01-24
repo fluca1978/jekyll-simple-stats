@@ -324,9 +324,13 @@ class Stat {
             <img src="{ self!graph-tags-url.Str }" alt="{ $!year } post ratio per tag" />
           </center>
         <br/>
+
+        <div align="right">
         <small>
         Last generated on { $now.Str }
         </small>
+        </div>
+
         <br/>
         _MD_
 
@@ -421,12 +425,9 @@ class Blog {
 
 
     method generate-markdown-credits {
-        my $now = DateTime.now( formatter =>
-                                { '%s at %d:%02d'.sprintf: .yyyy-mm-dd, .hour, .minute } );
         my $md = qq:to/_MD_/;
         <small>
-        The graphs and statistical data have been generated on
-        $now
+        The graphs and statistical data have been generated
         by the Raku
         script  { $*PROGRAM.IO.basename } running on $*PERL via $*VM.
         <br/>
