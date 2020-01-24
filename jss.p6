@@ -511,3 +511,33 @@ sub MAIN(
     }
 
 }
+
+
+sub USAGE() {
+    print qq:to/EOH/;
+    { $*USAGE }
+
+    Generates statistics data about your blog depending on how you named the posts
+    and the tags within the posts.
+    The posts must be named liked 'YYYY_MM_DD' and whatever you lie.
+    The tags must be included into a 'tags' list.
+
+    The Jekyll Home Directory is a mandatory argument and specifies the "home" of your
+    blog. From such directory, subdirectories like '_includes', '_posts' and alike
+    therefore your blog should adhere to Jekyll tree layout.
+
+
+    It is possible to generate a single year, and this is helpful when you want to update
+    only the statistics for the current year.
+
+    Please note that, in order for this to work, you need to include all the generated files
+    into your markdown page that will show the statistics.
+
+    As an example, the following is the invocation to generate all your statistics data:
+                   {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog
+
+   while if you want to update only a specific year you should invoke it as
+                  {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=2020
+
+   EOH
+}
