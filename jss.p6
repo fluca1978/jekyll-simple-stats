@@ -458,7 +458,7 @@ sub MAIN(
     where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
 
     , Int :$year?
-#          where { $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
+          where { ! .defined || $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
 )
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
