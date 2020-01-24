@@ -119,8 +119,11 @@ class Stat {
     has IO::Path $!home-directory;
 
     submethod BUILD( :@posts,
-                     Int :$year,
+                     Int:D :$year,
                      :$blog ){
+
+        fail "No posts!" if ! @posts;
+
         $!year = $year;
 
         for @posts -> $post {
@@ -382,6 +385,8 @@ class Blog {
             # store it in the list
             @!posts.push: $post;
         }
+
+        fail "No posts found in the blog!" if ! @!posts;
 
         say "Found { @!posts.elems } posts between years $!year-min and $!year-max";
     }
