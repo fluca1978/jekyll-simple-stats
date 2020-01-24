@@ -367,9 +367,12 @@ class Blog {
     }
 
 
-    method scan() {
+    method scan( Int :$year? ) {
         say 'Inspecting the post directory...';
         for $!dir-posts.IO.dir() -> $post-file {
+            # skip the file if the year is not good!
+            next if $year && ! $post-file.basename.match: / ^ $year /;
+
             my $post = Post.new( filename => $post-file );
 
             # is this post changing the years boundaries?
@@ -438,6 +441,9 @@ class Blog {
 sub MAIN(
     Str :$jekyll-home
     where { .IO.d // die "Please specify a home directory [$jekyll-home]" }
+
+    , Int :$year?
+          where { $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
 )
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
@@ -450,7 +456,7 @@ sub MAIN(
     $blog.generate-dirs-if-needed();
 
     # do the scan of the posts directory
-    $blog.scan();
+    $blog.scan( :$year );
 
     # now scan across the years
     my @include-instructions;
