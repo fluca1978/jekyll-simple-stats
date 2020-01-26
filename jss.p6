@@ -463,7 +463,7 @@ multi sub MAIN( Bool :$help )
 
 multi sub MAIN(
     Str :$jekyll-home
-    where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
+    where { .so && .IO.d // warn "Please specify an existing home directory [$jekyll-home]" }
 
     , Str :$year?
           where { ! .defined
