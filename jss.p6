@@ -573,6 +573,9 @@ sub USAGE() {
     it as a four-digits number, or the special string 'current' to say the year
     the clock reveals (useful for automated scripts).
 
+    In the case you use the --dry-run parameter, the script will act accordingly to
+    your wills, but no markdown file will be generated at all.
+
     Please note that, in order for this to work, you need to include all the generated files
     into your markdown page that will show the statistics.
 

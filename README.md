@@ -62,6 +62,23 @@ It is possible to specify two optional parameters to perform a partial generatio
 - `--year=dddd` does generate only the specified year, if there is some content to generate;
 - `--year=current` generates only the current year, in order to speed up the generation while keeping old stats untouched.
 
+### Dry-Run Mode
+
+It is possible to run the script in dry-run mode via the `--dry-run` option. This will just print out the execution of the script *without modifying any existing file*.
+As an example:
+
+```shell
+% perl6 jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io  --dry-run
+...
+{% include stats/2020.md %}
+{% include stats/credits.md %}
+
+ ===================================================================
+ WARNING: dry-run mode activated, no one file has been modified!
+ ===================================================================
+```
+
+
 
 # The Perl 5 Script
 
