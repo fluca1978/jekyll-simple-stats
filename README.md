@@ -79,6 +79,18 @@ As an example:
  ===================================================================
 ```
 
+### Directory Configuration
+
+The script uses the `--jekyll-home` value to compute automatically the directories in which searching for the posts, and in which writing the include files and the graph images. It is possible to tune the directories with the following parameters:
+- `--jekyll-home` the mandatory root of your blog;
+- `--dir-posts` the post directory, usually computed as `<jekyll-home>/_posts`;
+- `--dir-images` the image directory, usually computed as `<jekyll-home>/images/stats`;
+- `--dir-stats` the stats directory, usually computed as `<jekyll-home>/_includes/stats**.
+
+**The `--dir-stats` and `--dir-images` will be in every case created if they don't exist.**
+
+
+
 
 
 # The Perl 5 Script
