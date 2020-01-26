@@ -60,7 +60,7 @@ The script will generate the following files:
 
 It is possible to specify two optional parameters to perform a partial generation:
 - `--year=dddd` does generate only the specified year, if there is some content to generate;
-- `--current-year` generates only the current year, in order to speed up the generation while keeping old stats untouched.
+- `--year=current` generates only the current year, in order to speed up the generation while keeping old stats untouched.
 
 
 # The Perl 5 Script
