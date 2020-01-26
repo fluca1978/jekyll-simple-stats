@@ -531,16 +531,9 @@ multi sub MAIN(
         @include-instructions.push: $stat.jekyll-include-string;
     }
 
-    @include-instructions.unshift: $blog.generate-markdown-credits;
+    @include-instructions.push: $blog.generate-markdown-credits;
 
 
-    say qq:to/_HELP_/;
-
-    All done, please check that your stat file on your blog has
-    all the following includes (without any leading space!):
-
-    { @include-instructions.reverse.join( "\n" ) }
-    _HELP_
 
 
 
@@ -568,7 +561,17 @@ multi sub MAIN(
 
        _EXTRA_HELP_
     }
-    
+
+    say qq:to/_HELP_/;
+
+    All done, please check that your stat file on your blog has
+    all the following includes (without any leading space!):
+            8<---8<---8<---8<---8<--- BEGIN OF INCLUDE 8<---8<---8<---8<---8<---
+
+    { @include-instructions.join( "\n" ) }
+
+        --->8--->8--->8--->8--->8 END OF INCLUDE --->8--->8--->8--->8--->8
+    _HELP_
 
 }
 
