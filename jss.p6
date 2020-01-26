@@ -607,7 +607,15 @@ sub USAGE() {
                    {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=current
 
    and if you want to update only the previous year you should invoke it as
-    {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=previous
+                   {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=previous
+
+
+   It is possible to specify every single directory of your blog via the `--dir-xxx` parameters,
+   such as for example:
+                 {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog
+                                         --dir-posts=/path/to/blog/_posts
+                                         --dir-images=/path/to/blog/images/stats
+                                         --dir-stats=/path/to/blog/_include/stats
 
    EOH
 }
