@@ -471,11 +471,9 @@ multi sub MAIN(
         = $jekyll-home ~ '/_posts'
 
     , Str :$dir-images?
-    where { ! .defined || .IO.d || warn "Not an existing image directory [$dir-images]" }
         = $jekyll-home ~ '/images/stats'
 
     , Str :$dir-stats?
-    where { ! .defined || .IO.d || warn "Not an existing stats directory [$dir-stats]" }
         = $jekyll-home ~ '/_includes/stats'
 
 
