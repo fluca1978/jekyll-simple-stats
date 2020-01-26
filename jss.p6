@@ -383,7 +383,7 @@ class Blog {
     }
 
 
-    method scan( Int :$year? ) {
+    method scan( Int:D :$year? ) {
         say 'Inspecting the post directory...';
         my %found-years;
 
@@ -455,13 +455,15 @@ class Blog {
 
 
 
-
 sub MAIN(
     Str :$jekyll-home
     where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
 
     , Int :$year?
-          where { ! .defined || $_ ~~ / \d ** 4 / || die 'Year must be of four digits!' }
+          where { ! .defined || $_ ~~ / \d ** 4 / || warn 'Year must be of four digits!' }
+
+    , Bool :$current-year?
+           where { ! .defined || .defined && ! $year.defined || warn 'Cannot specify both current-year and year parameter' }
 )
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
@@ -473,8 +475,16 @@ sub MAIN(
     $blog.print-dirs();
     $blog.generate-dirs-if-needed();
 
+    # check which parameter for a single year we have
+    # in the case of quick use the current year
+    # while in the case of a single year use that
+    # or use Nil for a full generation
+    my $single-year = 0;
+    $single-year = DateTime.now.year.Int if $current-year;
+    $single-year = $year.Int if $year;
+
     # do the scan of the posts directory
-    $blog.scan( :$year );
+    $blog.scan( :year( $single-year ) );
 
     # now scan across the years
     my @include-instructions;
@@ -531,7 +541,7 @@ sub USAGE() {
 
     Generates statistics data about your blog depending on how you named the posts
     and the tags within the posts.
-    The posts must be named liked 'YYYY_MM_DD' and whatever you lie.
+    The posts must be named liked 'YYYY_MM_DD' and whatever you like.
     The tags must be included into a 'tags' list.
 
     The Jekyll Home Directory is a mandatory argument and specifies the "home" of your
@@ -541,6 +551,9 @@ sub USAGE() {
 
     It is possible to generate a single year, and this is helpful when you want to update
     only the statistics for the current year.
+    In particulare the --year parameter allows you to specify a single year
+    to generate, while the --current-year option forces the current year to be generated.
+    Please note that these two parameters are mutually exclusive.
 
     Please note that, in order for this to work, you need to include all the generated files
     into your markdown page that will show the statistics.
@@ -550,6 +563,9 @@ sub USAGE() {
 
    while if you want to update only a specific year you should invoke it as
                   {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=2020
+
+   and if you want to update only the current year you should invoke it as
+                   {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --current-year
 
    EOH
 }
