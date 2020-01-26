@@ -612,10 +612,10 @@ sub USAGE() {
 
    It is possible to specify every single directory of your blog via the `--dir-xxx` parameters,
    such as for example:
-                 {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog
-                                         --dir-posts=/path/to/blog/_posts
-                                         --dir-images=/path/to/blog/images/stats
-                                         --dir-stats=/path/to/blog/_include/stats
+                   {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog \\
+                          --dir-posts=/path/to/blog/_posts         \\
+                          --dir-images=/path/to/blog/images/stats  \\
+                          --dir-stats=/path/to/blog/_include/stats \\
 
    EOH
 }
