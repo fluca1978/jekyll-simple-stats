@@ -453,9 +453,13 @@ class Blog {
 }
 
 
+multi sub MAIN( Bool :$help )
+{
+        USAGE();
+}
 
 
-sub MAIN(
+multi sub MAIN(
     Str :$jekyll-home
     where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
 
