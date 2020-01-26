@@ -511,7 +511,7 @@ multi sub MAIN(
 
     # now scan across the years
     my @include-instructions;
-    for $blog.years.sort.reverse {
+    for $blog.years.sort {
 
         my @current-posts = $blog.get-posts( :year( $_ ) );
 
@@ -531,7 +531,7 @@ multi sub MAIN(
         @include-instructions.push: $stat.jekyll-include-string;
     }
 
-    @include-instructions.push: $blog.generate-markdown-credits;
+    @include-instructions.unshift: $blog.generate-markdown-credits;
 
 
 
@@ -568,7 +568,7 @@ multi sub MAIN(
     all the following includes (without any leading space!):
             8<---8<---8<---8<---8<--- BEGIN OF INCLUDE 8<---8<---8<---8<---8<---
 
-    { @include-instructions.join( "\n" ) }
+    { @include-instructions.reverse.join( "\n" ) }
 
         --->8--->8--->8--->8--->8 END OF INCLUDE --->8--->8--->8--->8--->8
     _HELP_
