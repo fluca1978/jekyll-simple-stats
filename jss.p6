@@ -466,7 +466,9 @@ multi sub MAIN(
     where { .so && .IO.d // warn "Please specify a home directory [$jekyll-home]" }
 
     , Str :$year?
-          where { ! .defined || $_ ~~ / \d ** 4 | current / || warn 'Year must be of four digits!' }
+          where { ! .defined
+                      || $_ ~~ / \d ** 4 | current | last | previous /
+                      || warn 'Year must be of four digits!' }
 
    , Bool :$dry-run?
 )
@@ -484,7 +486,8 @@ multi sub MAIN(
         # and in the case of 'current' use the current date year
     my Int $single-year = Nil;
     if $year {
-        $single-year = DateTime.now.year.Int if $year ~~ /current/;
+        $single-year = DateTime.now.year.Int     if $year ~~ /current/;
+        $single-year = DateTime.now.year.Int - 1 if $year ~~ /last | previous/;
         $single-year = $year.Int if $year ~~ Int;
     }
 
@@ -573,7 +576,8 @@ sub USAGE() {
     only the statistics for the current year.
     In particulare the --year parameter allows you to specify a single year by expressing
     it as a four-digits number, or the special string 'current' to say the year
-    the clock reveals (useful for automated scripts).
+    the clock reveals (useful for automated scripts). It is also possible to specify
+    the special string 'previous' (or 'last') to generate the year before the current one.
 
     In the case you use the --dry-run parameter, the script will act accordingly to
     your wills, but no markdown file will be generated at all.
@@ -589,6 +593,9 @@ sub USAGE() {
 
    and if you want to update only the current year you should invoke it as
                    {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=current
+
+   and if you want to update only the previous year you should invoke it as
+    {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=previous
 
    EOH
 }
