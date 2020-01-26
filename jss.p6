@@ -487,10 +487,10 @@ multi sub MAIN(
    , Bool :$dry-run?
 )
 {
-    my Blog $blog = Blog.new( dir-home => $jekyll-home,
-                              dir-posts => $dir-posts,
-                              dir-stats => $dir-stats,
-                              dir-images => $dir-images );
+    my Blog $blog = Blog.new( :dir-home( $jekyll-home ),
+                              :$dir-posts,
+                              :$dir-stats,
+                              :$dir-images );
 
     # show what we have configured so far
     $blog.print-dirs();
