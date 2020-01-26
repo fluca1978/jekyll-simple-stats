@@ -343,7 +343,10 @@ class Stat {
         # must be a path relative to the include dir!
         my ( $dir, $file ) = $!filename.path.split( '/' ).reverse[ 1, 0 ];
         my $relative-filename = $dir.IO.add( $file );
-        '{%% include %s %%}'.sprintf: $relative-filename;
+        qq:to/_INCLUDE_/;
+        \{% comment %\} Stats for year { $!year } \{% comment %\}
+        \{% include { $relative-filename } %\}
+        _INCLUDE_
     }
 }
 
