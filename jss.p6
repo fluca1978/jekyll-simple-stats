@@ -467,6 +467,8 @@ multi sub MAIN(
 
     , Str :$year?
           where { ! .defined || $_ ~~ / \d ** 4 | current / || warn 'Year must be of four digits!' }
+
+   , Bool :$dry-run?
 )
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
@@ -505,7 +507,7 @@ multi sub MAIN(
         $stat.Str.say;
 
         # generate the files for this year
-        $stat.generate-markdown;
+        $stat.generate-markdown if ! $dry-run;
 
         # store the include instructions
         @include-instructions.push: $stat.jekyll-include-string;
@@ -526,7 +528,7 @@ multi sub MAIN(
         say qq:to/_EXTRA_HELP_/;
 
         ===================================================================
-        WARNING: please note that you asked to generate only the year $year
+        WARNING: please note that you asked to generate only the $year year
         so there could be other years not included in this generation. Make
         sure your statistic data and included files are all in place and
         provide the result you want!
@@ -534,6 +536,19 @@ multi sub MAIN(
 
         _EXTRA_HELP_
     }
+
+    if $dry-run {
+        say qq:to/_EXTRA_HELP_/;
+
+        ===================================================================
+        WARNING: dry-run mode activated, no one file has been modified!
+        All the information printed above is useful only to get an estimated
+        count of the statistical data, but nothing has been updated!
+        ===================================================================
+
+       _EXTRA_HELP_
+    }
+    
 
 }
 
