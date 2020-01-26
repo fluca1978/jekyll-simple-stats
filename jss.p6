@@ -520,9 +520,11 @@ multi sub MAIN(
 
     All done, please check that your stat file on your blog has
     all the following includes (without any leading space!):
+
+    { @include-instructions.reverse.join( "\n" ) }
     _HELP_
 
-    @include-instructions.reverse.join( "\n" ).say;
+
 
     if $year {
         say qq:to/_EXTRA_HELP_/;
