@@ -360,8 +360,8 @@ class Blog {
 
     has Post @.posts;       # a list of posts
 
-    # range of years for the whole blog
-    has Int ( $.year-min, $.year-max );
+    # effective years of blog posts found
+    has Int @.years;
 
     # An info method to display the content
     # of this blog object.
@@ -385,15 +385,16 @@ class Blog {
 
     method scan( Int :$year? ) {
         say 'Inspecting the post directory...';
+        my %found-years;
+
         for $!dir-posts.IO.dir() -> $post-file {
             # skip the file if the year is not good!
             next if $year && ! $post-file.basename.match: / ^ $year /;
 
             my $post = Post.new( filename => $post-file );
 
-            # is this post changing the years boundaries?
-            $!year-min = $post.year if ! $!year-min || $post.year < $!year-min;
-            $!year-max = $post.year if ! $!year-max || $post.year > $!year-max;
+            # save this year if not seen before
+            %found-years{ $post.year }++;
 
             # store it in the list
             @!posts.push: $post;
@@ -401,7 +402,9 @@ class Blog {
 
         fail "No posts found in the blog!" if ! @!posts;
 
-        say "Found { @!posts.elems } posts between years $!year-min and $!year-max";
+        # stores the years
+        @!years = %found-years.keys.sort.map: *.Int;
+        say "Found { @!posts.elems } posts within years { @!years }";
     }
 
     method posts-as-hash() {
@@ -419,7 +422,7 @@ class Blog {
     # If no year is provided, all the posts are returned.
     method get-posts( Int :$year? ) {
         return @!posts if ! $year;
-        return () if $year > $!year-max || $year < $!year-min;
+        return () if ! @!years.grep: $year;
         return @!posts.grep( { .year == $year } ) if $year;
     }
 
@@ -475,7 +478,7 @@ sub MAIN(
 
     # now scan across the years
     my @include-instructions;
-    for $blog.year-min .. $blog.year-max {
+    for $blog.years.sort.reverse {
 
         my @current-posts = $blog.get-posts( :year( $_ ) );
 
