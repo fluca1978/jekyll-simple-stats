@@ -17,7 +17,7 @@ The script names are different: the Raku script has a shorter name `jss.p6`, whi
 ## Synopsis
 
 ```shell
-% perl6 jss.p6 --jekyll-home=<where is your blog>
+% perl6 jss.p6 --jekyll-home=<where is your blog> 
 ```
 
 ## Usage
@@ -55,6 +55,13 @@ The output could be different depending on your post ratio and years.
 The script will generate the following files:
 - images files into your Jekyll home, folder `images/stats`, two PNG files per year (e.g., `2008-tags.png`, `2008-months.png`);
 - text file (in markdown format) into your Jekyll home, folder `_includes/stats/_`, one per year (e.g., `2008.md`).
+
+### Partial Stats Generation
+
+It is possible to specify two optional parameters to perform a partial generation:
+- `--year=dddd` does generate only the specified year, if there is some content to generate;
+- `--current-year` generates only the current year, in order to speed up the generation while keeping old stats untouched.
+
 
 # The Perl 5 Script
 
