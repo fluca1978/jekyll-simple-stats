@@ -465,6 +465,20 @@ multi sub MAIN(
     Str :$jekyll-home
     where { .so && .IO.d // warn "Please specify an existing home directory [$jekyll-home]" }
 
+
+    , Str :$dir-posts?
+    where { ! .defined || .IO.d || warn "Not an existing posts directory [$dir-posts]" }
+        = $jekyll-home ~ '/_posts'
+
+    , Str :$dir-images?
+    where { ! .defined || .IO.d || warn "Not an existing image directory [$dir-images]" }
+        = $jekyll-home ~ '/images/stats'
+
+    , Str :$dir-stats?
+    where { ! .defined || .IO.d || warn "Not an existing stats directory [$dir-stats]" }
+        = $jekyll-home ~ '/_includes/stats'
+
+
     , Str :$year?
           where { ! .defined
                       || $_ ~~ / \d ** 4 | current | last | previous /
@@ -474,9 +488,9 @@ multi sub MAIN(
 )
 {
     my Blog $blog = Blog.new( dir-home => $jekyll-home,
-                              dir-posts => $jekyll-home ~ '/_posts',
-                              dir-stats => $jekyll-home ~ '/_includes/stats',
-                              dir-images => $jekyll-home ~ '/images/stats' );
+                              dir-posts => $dir-posts,
+                              dir-stats => $dir-stats,
+                              dir-images => $dir-images );
 
     # show what we have configured so far
     $blog.print-dirs();
