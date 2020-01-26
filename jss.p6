@@ -388,6 +388,8 @@ class Blog {
         my %found-years;
 
         for $!dir-posts.IO.dir() -> $post-file {
+            # skip non file stuff..
+            next if ! $post-file.f;
             # skip the file if the year is not good!
             next if $year && ! $post-file.basename.match: / ^ $year /;
 
