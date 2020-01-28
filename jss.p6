@@ -180,10 +180,7 @@ class Stat {
         join( ",\n\t\t", self.tags );
     }
 
-    method !is-current-year(){
-        my $now = DateTime.now;
-        return $now.year == $!year;
-    }
+    method !is-current-year(){ DateTime.now.year == $!year }
 
 
     method !graph-tags-url() {
