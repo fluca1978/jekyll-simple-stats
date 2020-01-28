@@ -409,16 +409,6 @@ class Blog {
         say "Found { @!posts.elems } posts within years { @!years.join( ', ' ) }" if $*verbose;
     }
 
-    method posts-as-hash() {
-        my %posts-per-year;
-
-        for @!posts -> $post {
-            %posts-per-year{ $post.year }{ $post.month }.push: $post;
-        }
-
-        return %posts-per-year;
-    }
-
     #
     # Provides all the posts in a specified year.
     # If no year is provided, all the posts are returned.
