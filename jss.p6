@@ -512,7 +512,7 @@ multi sub MAIN(
     # now scan across the years
     my @include-instructions;
     for $blog.years.sort {
-        "Extracting data for year $_".say if $*verbose;
+        "\nExtracting data for year $_".say if $*verbose;
 
         my @current-posts = $blog.get-posts( :year( $_ ) );
 
