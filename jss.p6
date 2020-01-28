@@ -467,23 +467,23 @@ multi sub MAIN(
 
 
     , Str :$dir-posts?
-    where { ! .defined || .IO.d || warn "Not an existing posts directory [$dir-posts]" }
-        = $jekyll-home ~ '/_posts'
+          where { ! .defined || .IO.d || warn "Not an existing posts directory [$dir-posts]" }
+    = $jekyll-home ~ '/_posts'
 
     , Str :$dir-images?
-        = $jekyll-home ~ '/images/stats'
+          = $jekyll-home ~ '/images/stats'
 
     , Str :$dir-stats?
-        = $jekyll-home ~ '/_includes/stats'
+          = $jekyll-home ~ '/_includes/stats'
 
 
     , Str :$year?
           where { ! .defined
-                      || $_ ~~ / \d ** 4 | current | last | previous /
-                      || warn 'Year must be of four digits!' }
+                  || $_ ~~ / \d ** 4 | current | last | previous /
+                  || warn 'Year must be of four digits!' }
 
-        , Bool :$dry-run?
-        , Bool :$*verbose?
+    , Bool :$dry-run?
+    , Bool :$*verbose?
 )
 {
     my Blog $blog = Blog.new( :dir-home( $jekyll-home ),
@@ -495,8 +495,8 @@ multi sub MAIN(
     $blog.print-dirs();
     $blog.generate-dirs-if-needed();
 
-        # check which parameter for a single year we have
-        # and in the case of 'current' use the current date year
+    # check which parameter for a single year we have
+    # and in the case of 'current' use the current date year
     my Int $single-year = Nil;
     if $year {
         $single-year = DateTime.now.year.Int     if $year ~~ /current/;
