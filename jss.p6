@@ -406,7 +406,7 @@ class Blog {
 
         # stores the years
         @!years = %found-years.keys.sort.map: *.Int;
-        say "Found { @!posts.elems } posts within years { @!years }";
+        say "Found { @!posts.elems } posts within years { @!years.join( ', ' ) }";
     }
 
     method posts-as-hash() {
