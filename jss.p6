@@ -384,7 +384,7 @@ class Blog {
 
 
     method scan( Int :$year? ) {
-        say 'Inspecting the post directory...';
+        say 'Inspecting the post directory...' if $*verbose;
         my %found-years;
 
         for $!dir-posts.IO.dir() -> $post-file {
@@ -406,7 +406,7 @@ class Blog {
 
         # stores the years
         @!years = %found-years.keys.sort.map: *.Int;
-        say "Found { @!posts.elems } posts within years { @!years.join( ', ' ) }";
+        say "Found { @!posts.elems } posts within years { @!years.join( ', ' ) }" if $*verbose;
     }
 
     method posts-as-hash() {
@@ -483,7 +483,7 @@ multi sub MAIN(
                       || warn 'Year must be of four digits!' }
 
         , Bool :$dry-run?
-        , Bool :$verbose?
+        , Bool :$*verbose?
 )
 {
     my Blog $blog = Blog.new( :dir-home( $jekyll-home ),
@@ -503,7 +503,7 @@ multi sub MAIN(
         $single-year = DateTime.now.year.Int - 1 if $year ~~ /last | previous/;
         $single-year = $year.Int if $year ~~ Int;
 
-        "Using year $single-year".say if $verbose;
+        "Using year $single-year".say if $*verbose;
     }
 
     # do the scan of the posts directory
@@ -512,7 +512,7 @@ multi sub MAIN(
     # now scan across the years
     my @include-instructions;
     for $blog.years.sort {
-        "Extracting data for year $_".say if $verbose;
+        "Extracting data for year $_".say if $*verbose;
 
         my @current-posts = $blog.get-posts( :year( $_ ) );
 
@@ -523,7 +523,7 @@ multi sub MAIN(
         year => $_,
         blog => $blog;
 
-        $stat.Str.say if $verbose;
+        $stat.Str.say if $*verbose;
 
         # generate the files for this year
         $stat.generate-markdown if ! $dry-run;
