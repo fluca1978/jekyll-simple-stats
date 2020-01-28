@@ -382,7 +382,6 @@ class Blog {
 
     method scan( Int :$year? ) {
         say 'Inspecting the post directory...' if $*verbose;
-        my %found-years;
 
         for $!dir-posts.IO.dir() -> $post-file {
             # skip non file stuff..
@@ -397,13 +396,13 @@ class Blog {
 
             # store it in the list
             @!posts.push: $post;
+
+            # store the year
+            @!years.push( $post.year ) if ! @!years.contains( $post.year );
         }
 
         fail "No posts found in the blog!" if ! @!posts;
-
-        # stores the years
-        @!years = %found-years.keys.sort.map: *.Int;
-        say "Found { @!posts.elems } posts within years { @!years.join( ', ' ) }" if $*verbose;
+        say "Found { @!posts.elems } posts within years { @!years.sort.join( ', ' ) }" if $*verbose;
     }
 
     #
