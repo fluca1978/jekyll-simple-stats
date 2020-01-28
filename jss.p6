@@ -482,7 +482,8 @@ multi sub MAIN(
                       || $_ ~~ / \d ** 4 | current | last | previous /
                       || warn 'Year must be of four digits!' }
 
-   , Bool :$dry-run?
+        , Bool :$dry-run?
+        , Bool :$verbose?
 )
 {
     my Blog $blog = Blog.new( :dir-home( $jekyll-home ),
@@ -501,6 +502,8 @@ multi sub MAIN(
         $single-year = DateTime.now.year.Int     if $year ~~ /current/;
         $single-year = DateTime.now.year.Int - 1 if $year ~~ /last | previous/;
         $single-year = $year.Int if $year ~~ Int;
+
+        "Using year $single-year".say if $verbose;
     }
 
     # do the scan of the posts directory
@@ -509,6 +512,7 @@ multi sub MAIN(
     # now scan across the years
     my @include-instructions;
     for $blog.years.sort {
+        "Extracting data for year $_".say if $verbose;
 
         my @current-posts = $blog.get-posts( :year( $_ ) );
 
@@ -519,7 +523,7 @@ multi sub MAIN(
         year => $_,
         blog => $blog;
 
-        $stat.Str.say;
+        $stat.Str.say if $verbose;
 
         # generate the files for this year
         $stat.generate-markdown if ! $dry-run;
@@ -594,7 +598,7 @@ sub USAGE() {
     the clock reveals (useful for automated scripts). It is also possible to specify
     the special string 'previous' (or 'last') to generate the year before the current one.
 
-    In the case you use the --dry-run parameter, the script will act accordingly to
+    In the case you use the `--dry-run` parameter, the script will act accordingly to
     your wills, but no markdown file will be generated at all.
 
     Please note that, in order for this to work, you need to include all the generated files
@@ -620,5 +624,7 @@ sub USAGE() {
                           --dir-images=/path/to/blog/images/stats  \\
                           --dir-stats=/path/to/blog/_include/stats \\
 
+
+   You can enable extra verbose output with the `--verbose` command line flag.
    EOH
 }
