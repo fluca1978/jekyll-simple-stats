@@ -566,12 +566,12 @@ multi sub MAIN(
     say qq:to/_HELP_/;
 
     All done, please check that your stat file on your blog has
-    all the following includes (without any leading space!):
-            8<---8<---8<---8<---8<--- BEGIN OF INCLUDE 8<---8<---8<---8<---8<---
+    all the following include directives (without any leading space!):
+        8<---8<---8<---8<---8<--- BEGIN OF INCLUDE 8<---8<---8<---8<---8<---
 
     { @include-instructions.reverse.join( "\n" ) }
 
-        --->8--->8--->8--->8--->8 END OF INCLUDE --->8--->8--->8--->8--->8
+        --->8--->8--->8--->8--->8  END OF INCLUDE  --->8--->8--->8--->8--->8
     _HELP_
 
 }
