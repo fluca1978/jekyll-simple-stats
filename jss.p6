@@ -495,9 +495,13 @@ multi sub MAIN(
     # and in the case of 'current' use the current date year
     my Int $single-year = Nil;
     if $year {
-        $single-year = DateTime.now.year.Int     if $year ~~ /current/;
-        $single-year = DateTime.now.year.Int - 1 if $year ~~ /last | previous/;
-        $single-year = $year.Int if $year ~~ Int;
+        my $this-year = DateTime.now.year;
+        $single-year = do given $year {
+            when Int                         { $year <= $this-year ?? $year !! $this-year }
+            when /:i ^ current $ /           { $this-year }
+            when /:i ^ [last | previous] $ / { $this-year - 1 }
+            default                          { $this-year }
+        };
 
         "Using year $single-year".say if $*verbose;
     }
