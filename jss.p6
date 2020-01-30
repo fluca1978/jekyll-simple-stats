@@ -8,6 +8,10 @@
 # Rewritten in Perl 6 on January 2020
 #
 
+
+use Terminal::ANSIColor;
+
+
 # A regex to parse the name of a post file,
 # that is done with yyyy-mm-dd-title
 my regex rx_post_filename { ^ $<year>=\d ** 4 \- $<month>=\d ** 2 \- $<day>=\d ** 2 };
@@ -369,7 +373,7 @@ class Blog {
     # An info method to display the content
     # of this blog object.
     method print-dirs(){
-        say qq:to/_DIRS_/;
+        say colored( qq:to/_DIRS_/, 'bold italic cyan' );
         Home directory in [$!dir-home]
              Posts in     [$!dir-posts]
              Images in    [$!dir-images]
@@ -387,7 +391,7 @@ class Blog {
 
 
     method scan( Int :$year? ) {
-        say 'Inspecting the post directory...' if $*verbose;
+        say colored( 'Inspecting the post directory...', 'yellow' ) if $*verbose;
 
         for $!dir-posts.IO.dir() -> $post-file {
             # skip non file stuff..
@@ -405,7 +409,7 @@ class Blog {
         }
 
         fail "No posts found in the blog!" if ! @!posts;
-        say "Found { @!posts.elems } posts within years { @!years.sort.join( ', ' ) }" if $*verbose;
+        say colored( "Found { @!posts.elems } posts within years { @!years.sort.join( ', ' ) }", 'green' ) if $*verbose;
     }
 
     #
@@ -503,11 +507,11 @@ multi sub MAIN(
             default                          { $this-year }
         };
 
-        "Using year $single-year".say if $*verbose;
+        say colored( "Using year $single-year", 'yellow' ) if $*verbose;
     }
 
     # display the color used for graphs
-    "Using graph color $graph-color".say if $*verbose;
+    say colored( "Using graph color $graph-color", 'yellow' ) if $*verbose;
 
     # do the scan of the posts directory
     $blog.scan( :year( $single-year ) );
@@ -515,7 +519,7 @@ multi sub MAIN(
     # now scan across the years
     my @include-instructions;
     for $blog.years.sort {
-        "\nExtracting data for year $_".say if $*verbose;
+        say colored( "\nExtracting data for year $_", 'yellow' ) if $*verbose;
 
         my @current-posts = $blog.get-posts( :year( $_ ) );
 
@@ -527,7 +531,7 @@ multi sub MAIN(
         blog => $blog,
         graph-color => $graph-color;
 
-        $stat.Str.say if $*verbose;
+        say colored( $stat.Str, 'green' ) if $*verbose;
 
         # generate the files for this year
         $stat.generate-markdown if ! $dry-run;
@@ -543,7 +547,7 @@ multi sub MAIN(
 
 
     if $year {
-        say qq:to/_EXTRA_HELP_/;
+        say colored( qq:to/_EXTRA_HELP_/, 'bold red' );
 
         ===================================================================
         WARNING: please note that you asked to generate only the $year year
@@ -556,7 +560,7 @@ multi sub MAIN(
     }
 
     if $dry-run {
-        say qq:to/_EXTRA_HELP_/;
+        say colored( qq:to/_EXTRA_HELP_/, 'bold red' );
 
         ===================================================================
         WARNING: dry-run mode activated, no one file has been modified!
@@ -571,11 +575,12 @@ multi sub MAIN(
 
     All done, please check that your stat file on your blog has
     all the following include directives (without any leading space!):
-        8<---8<---8<---8<---8<--- BEGIN OF INCLUDE 8<---8<---8<---8<---8<---
 
-    { @include-instructions.reverse.join( "\n" ) }
+    { colored( '8<---8<---8<---8<---8<--- BEGIN OF INCLUDE 8<---8<---8<---8<---8<---', 'italic' ) }
 
-        --->8--->8--->8--->8--->8  END OF INCLUDE  --->8--->8--->8--->8--->8
+    { colored( @include-instructions.reverse.join( "\n" ), 'bold cyan' ) }
+
+    { colored( '--->8--->8--->8--->8--->8  END OF INCLUDE  --->8--->8--->8--->8--->8', 'italic' ) }
     _HELP_
 
 }

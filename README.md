@@ -100,9 +100,11 @@ It is possible to change the color of the graphs by using the command line argum
      
      
 
-## Dependencies
+## Dependencies (of the Raku version)
 
-The Raku version exploits the module [Chart::Gnuplot](https://github.com/titsuki/raku-Chart-Gnuplot) to generate the graphs. It is required you have installed all the machinery to make `gnuplot` working.
+- [Chart::Gnuplot](https://github.com/titsuki/raku-Chart-Gnuplot) to generate the graphs. It is required you have installed all the machinery to make `gnuplot` working.
+- [Terminal::ANSIColor](https://github.com/tadzik/Terminal-ANSIColor/tree/master/lib/Terminal){:target="_blank"} to generate fancy output.
+
 
 
 
