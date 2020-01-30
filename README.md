@@ -89,7 +89,13 @@ The script uses the `--jekyll-home` value to compute automatically the directori
 
 **The `--dir-stats` and `--dir-images` will be in every case created if they don't exist.**
 
+### Graph Colors
 
+It is possible to change the color of the graphs by using the command line argument `--graph-color` that accepts an RGB like string, for example
+
+     % perl6 jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io --graph-color=00aacc
+     
+     
 
 ## Dependencies
 

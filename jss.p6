@@ -117,14 +117,17 @@ class Stat {
     has IO::Path $!graph-tags-filename;
     has IO::Path $!graph-months-filename;
     has IO::Path $!home-directory;
+    has Str $!graph-color where { .uc ~~ / ^ <[0..9A..F]> ** 6 $ / } = '00AA00';
 
     submethod BUILD( :@posts,
                      Int:D :$year,
-                     :$blog ){
+                     :$blog,
+                     Str :$graph-color? ){
 
         fail "No posts for year $year!" if ! @posts;
 
         $!year = $year;
+        $!graph-color = $graph-color if $graph-color;
 
         for @posts -> $post {
             next if $post !~~ Post;
@@ -222,7 +225,7 @@ class Stat {
         style => 'histogram',
         title => '',
         fill => "solid 1.0",
-        linecolor => 'rgb "#bb00FF"'
+        linecolor => 'rgb "#%s"'.sprintf: $!graph-color
         ;
 
         $gnuplot.dispose;
@@ -275,7 +278,7 @@ class Stat {
         style => 'histogram',
         title => '',
         fill => "solid 1.0",
-        linecolor => 'rgb "#bb00FF"'
+        linecolor => 'rgb "#%s"'.sprintf: $!graph-color
         ;
 
         $gnuplot.dispose;
@@ -470,12 +473,19 @@ multi sub MAIN(
 
     , Bool :$dry-run?
     , Bool :$*verbose?
+    , Str :$graph-color?
+          where { .uc ~~ / ^ <[0..9A..F]> ** 6 / }
+    = 'BB00FF'
 )
 {
     my Blog $blog = Blog.new( :dir-home( $jekyll-home ),
                               :$dir-posts,
                               :$dir-stats,
                               :$dir-images );
+
+
+
+
 
     # show what we have configured so far
     $blog.print-dirs();
@@ -492,6 +502,9 @@ multi sub MAIN(
         "Using year $single-year".say if $*verbose;
     }
 
+    # display the color used for graphs
+    "Using graph color $graph-color".say if $*verbose;
+
     # do the scan of the posts directory
     $blog.scan( :year( $single-year ) );
 
@@ -507,7 +520,8 @@ multi sub MAIN(
 
         my $stat = Stat.new: posts => @current-posts ,
         year => $_,
-        blog => $blog;
+        blog => $blog,
+        graph-color => $graph-color;
 
         $stat.Str.say if $*verbose;
 
@@ -612,5 +626,8 @@ sub USAGE() {
 
 
    You can enable extra verbose output with the `--verbose` command line flag.
+
+   The color of the graphs can be customized with the `--grap-color` option, that accepts an RGB
+   string (e.g., '00BB77') that will be used. If none is provided, the default color 'BB00FF' will be used.
    EOH
 }
