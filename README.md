@@ -63,6 +63,9 @@ It is possible to specify two optional parameters to perform a partial generatio
 - `--year=current` generates only the current year, in order to speed up the generation while keeping old stats untouched;
 - `--year=last` or also `--year=previous` generates only the last year (that is this current year as obtained by the system clock minus one year).
 
+Please note that you cannot specify an year greater than the current one, and therefore **if you specify
+an year in the future you will generate the single *current* year**.
+
 ### Dry-Run Mode
 
 It is possible to run the script in dry-run mode via the `--dry-run` option. This will just print out the execution of the script *without modifying any existing file*.

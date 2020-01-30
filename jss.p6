@@ -620,6 +620,8 @@ sub USAGE() {
    and if you want to update only the previous year you should invoke it as
                    {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --year=previous
 
+   Please note that you cannot specify an year greater than the current one, in such case
+   you will generate only the current year.
 
    It is possible to specify every single directory of your blog via the `--dir-xxx` parameters,
    such as for example:
