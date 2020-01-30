@@ -207,9 +207,6 @@ class Stat {
         my @data = self.tags.map: { [ .key, .value ] };
         my AnyTicsTic @tics = self.tags.map: { %( label => .key, pos => $++ ) };
 
-        say @tics;
-        say @data;
-
         my $gnuplot = Chart::Gnuplot.new:
         terminal => 'png',
         filename => $!graph-tags-filename.Str;
@@ -233,47 +230,56 @@ class Stat {
 
 
     method !generate-months-graph(){
-        my $csv-temp-file = "/tmp/{$!year}-months.csv";
-        my $gnuplot-file  = "/tmp/{$!year}-months.gnuplot";
 
-        my $fh = open $csv-temp-file, :w;
+        use Chart::Gnuplot;
+        use Chart::Gnuplot::Subset;
+
+
+        # build an array of arrays, each line is a data
+        my @data;
         # WARNING: need to iterate on all the months or 0-months will
         # make gnuplot complain!
         for 1..12 -> $month {
             my $key = sprintf '%02d', $month;
             my $count = %!posts-count{ $key } // 0;
-            $fh.say( '%04d-%02d;%d;'.sprintf( $!year, $key, $count ) );
+            @data.push: [ '%04d-%02d'.sprintf( $!year, $key ), $count ];
         }
 
-        $fh.close;
+        my AnyTicsTic @tics = %( label => 'January', pos => 0 ),
+        %( label => 'February', pos => 1 ),
+        %( label => 'March', pos => 2 ),
+        %( label => 'April', pos => 3 ),
+        %( label => 'May', pos => 4 ),
+        %( label => 'June', pos => 5 ),
+        %( label => 'July', pos => 6 ),
+        %( label => 'August', pos => 7 ),
+        %( label => 'September', pos => 8 ),
+        %( label => 'October', pos => 9 ),
+        %( label => 'November', pos => 10 ),
+        %( label => 'December', pos => 11 );
 
-        my $gnuplot = qq:to/_GNUPLOT_/;
-        #!env gnuplot
-        reset
-        set terminal png
-        set title "{ $!year } Post Ratio"
-        set xlabel "Month"
-        set xdata time
-        set timefmt '%Y-%m'
-        set format x "%B"
-        set xrange ["{ $!year }-01":"{ $!year }-12"]
-        set xtics "{ $!year }-01", 2592000 rotate by 60 right
-        set datafile separator ';'
-        set ylabel "Number of Posts"
-        set grid
-        set style fill solid 1.0
-        set boxwidth 0.8 relative
-        plot "$csv-temp-file"  using 1:2 title "" with boxes linecolor rgb "#bb00FF"
-        _GNUPLOT_
 
-        spurt $gnuplot-file, $gnuplot;
 
-        # now run gnuplot
-        shell "gnuplot $gnuplot-file > $!graph-months-filename";
+        my $gnuplot = Chart::Gnuplot.new:
+        terminal => 'png',
+        filename => $!graph-months-filename.Str;
 
-        # remove the files
-        $csv-temp-file.IO.unlink;
-        $gnuplot-file.IO.unlink;
+        $gnuplot.xlabel( label => 'Month' );
+        $gnuplot.ylabel( label => 'Number of Posts' );
+        $gnuplot.title( text => "{ $!year } Post Ratio by Month" );
+        $gnuplot.xtics( tics => @tics, :right, :rotate( 60 ) );
+        $gnuplot.yrange( min => 0, max => %!posts-count.map( { .value // 0 } ).max );
+        $gnuplot.plot:
+        vertices => @data,
+        using => [2],
+        style => 'histogram',
+        title => '',
+        fill => "solid 1.0",
+        linecolor => 'rgb "#bb00FF"'
+        ;
+
+        $gnuplot.dispose;
+
     }
 
 
