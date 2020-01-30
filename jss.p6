@@ -122,7 +122,7 @@ class Stat {
                      Int:D :$year,
                      :$blog ){
 
-        fail "No posts!" if ! @posts;
+        fail "No posts for year $year!" if ! @posts;
 
         $!year = $year;
 
