@@ -91,6 +91,10 @@ The script uses the `--jekyll-home` value to compute automatically the directori
 
 
 
+## Dependencies
+
+The Raku version exploits the module [Chart::Gnuplot](https://github.com/titsuki/raku-Chart-Gnuplot) to generate the graphs. It is required you have installed all the machinery to make `gnuplot` working.
+
 
 
 # The Perl 5 Script
