@@ -199,39 +199,36 @@ class Stat {
 
 
     method !generate-tags-graph(){
-        my $csv-temp-file = "/tmp/{$!year}-tags.csv";
-        my $gnuplot-file  = "/tmp/{$!year}-tags.gnuplot";
+        use Chart::Gnuplot;
+        use Chart::Gnuplot::Subset;
 
-        my $fh = open $csv-temp-file, :w;
-        for self.tags -> $tag-pair {
-            $fh.say( '%s;%d;'.sprintf( $tag-pair.key, $tag-pair.value ) );
-        }
 
-        $fh.close;
+        # build an array of arrays, each line is a data
+        my @data = self.tags.map: { [ .key, .value ] };
+        my AnyTicsTic @tics = self.tags.map: { %( label => .key, pos => $++ ) };
 
-        my $gnuplot = qq:to/_GNUPLOT_/;
-        #!env gnuplot
-        reset
-        set terminal png
-        set title "{ $!year } Most Frequent Tags"
-        set auto x
-        set xlabel "Tag"
-        set xtics rotate by 60 right
-        set datafile separator ';'
-        set ylabel "Posts"
-        set style fill solid 1.0
-        set boxwidth 0.9 relative
-        plot "$csv-temp-file"  using 2:xtic(1) title "" with boxes linecolor rgb "#bb00FF"
-        _GNUPLOT_
+        say @tics;
+        say @data;
 
-        spurt $gnuplot-file, $gnuplot;
+        my $gnuplot = Chart::Gnuplot.new:
+        terminal => 'png',
+        filename => $!graph-tags-filename.Str;
 
-        # now run gnuplot
-        shell "gnuplot $gnuplot-file > $!graph-tags-filename";
+        $gnuplot.xlabel( label => 'Tag' );
+        $gnuplot.ylabel( label => 'Posts' );
+        $gnuplot.title( text => "{ $!year } Most Frequent Tags" );
+        $gnuplot.xtics( tics => @tics, :right, :rotate( 60 ) );
+        $gnuplot.yrange( min => 0, max => self.tags.map( { .value } ).max );
+        $gnuplot.plot:
+        vertices => @data,
+        using => [2],
+        style => 'histogram',
+        title => '',
+        fill => "solid 1.0",
+        linecolor => 'rgb "#bb00FF"'
+        ;
 
-        # remove the files
-        $csv-temp-file.IO.unlink;
-        $gnuplot-file.IO.unlink;
+        $gnuplot.dispose;
     }
 
 
@@ -390,9 +387,6 @@ class Blog {
             next if $year && ! $post-file.basename.match: / ^ $year /;
 
             my $post = Post.new( filename => $post-file );
-
-            # save this year if not seen before
-            %found-years{ $post.year }++;
 
             # store it in the list
             @!posts.push: $post;
