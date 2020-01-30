@@ -540,7 +540,7 @@ multi sub MAIN(
         @include-instructions.push: $stat.jekyll-include-string;
     }
 
-    @include-instructions.unshift: $blog.generate-markdown-credits;
+    @include-instructions.unshift: $blog.generate-markdown-credits if ! $dry-run;
 
 
 
