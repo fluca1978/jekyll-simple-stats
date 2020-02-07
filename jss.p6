@@ -649,5 +649,10 @@ sub USAGE() {
 
    The color of the graphs can be customized with the `--grap-color` option, that accepts an RGB
    string (e.g., '00BB77') that will be used. If none is provided, the default color 'BB00FF' will be used.
-   EOH
+
+   The number of the tags shown in the "Tag Ratio" graph can be customized with the `--tag-limit` option.
+   The default value is 30, you can increase or decrease such value but please consider that such value could make the graph labels overlapping. As an example:
+                            {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --tag-count=20
+
+  EOH
 }

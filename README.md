@@ -98,7 +98,11 @@ It is possible to change the color of the graphs by using the command line argum
 
      % perl6 jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io --graph-color=00aacc
      
-     
+### Number of Tags in the Graph
+
+It is possible to customize the number of tags to be included in the "Tag Ratio" graph with the option `--tag-limit`, that defaults to `30`. This means that in the graph no more tags then `--tag-limit` will be displayed.
+
+     % perl6 jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io --tag-limit=10
 
 ## Dependencies (of the Raku version)
 
