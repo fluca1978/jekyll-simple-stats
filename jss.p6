@@ -1,4 +1,4 @@
-#!env perl6
+#!env raku
 
 # Jekyll Simple Stats
 #
