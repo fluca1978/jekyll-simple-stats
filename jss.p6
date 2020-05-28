@@ -304,7 +304,7 @@ class Stat {
 
         **{ self.count } total posts** have been written on { $!year }.
         There have been *{ self.count-tags } different tags* used, the most
-        used popular being (in order of number of posts):
+        popular being (sorted by number of posts):
         _MD_
         for self.tags -> $tag-pair {
             $markdown = "%s \n- *%s* (%d posts) ".sprintf: $markdown, $tag-pair.key, $tag-pair.value;
