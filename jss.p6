@@ -1,11 +1,11 @@
-#!env perl6
+#!raku
 
 # Jekyll Simple Stats
 #
 # A simple program to generate very basic statistics
 # about a Jekyll blog.
 #
-# Rewritten in Perl 6 on January 2020
+# Rewritten in Raku on January 2020
 #
 
 
@@ -427,7 +427,7 @@ class Blog {
         <small>
         The graphs and statistical data have been generated
         by the Raku
-        script  { $*PROGRAM.IO.basename } running on $*PERL via $*VM.
+        script  { $*PROGRAM.IO.basename } running on $*RAKU via $*VM.
         <br/>
         See <a href="https://github.com/fluca1978/jekyll-simple-stats" target="_new">
                <i>Jekyll Simple Stats</i>
