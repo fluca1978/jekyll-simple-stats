@@ -1,5 +1,6 @@
 #!raku
 
+
 # Jekyll Simple Stats
 #
 # A simple program to generate very basic statistics
@@ -116,6 +117,7 @@ class Stat {
     has %!posts-count; # how many posts are there in every single month
     has %!tags-count;  # how many posts are there for a specific tag
     has Int $!year;
+    has Int $!tag-limit;
     has IO::Path $!filename;
     has IO::Path $!include-directory;
     has IO::Path $!graph-tags-filename;
@@ -126,12 +128,14 @@ class Stat {
     submethod BUILD( :@posts,
                      Int:D :$year,
                      :$blog,
+                     Int:D :$tag-limit,
                      Str :$graph-color? ){
 
         fail "No posts for year $year!" if ! @posts;
 
         $!year = $year;
         $!graph-color = $graph-color if $graph-color;
+        $!tag-limit   = $tag-limit;
 
         for @posts -> $post {
             next if $post !~~ Post;
@@ -173,9 +177,10 @@ class Stat {
 
     # Returns a list of Pair objects, where the key is the tag name
     # and the value is the post count.
-    method tags( Int $limit = 10){
+    method tags(){
         my @tags =  %!tags-count.pairs.sort( { $^b.value <=> $^a.value } );
-        return @tags[ 0..$limit ];
+        my Int $limit = @tags.elems > $!tag-limit ?? $!tag-limit !! @tags.elems - 1;
+        return @tags[ 0 .. $limit ];
     }
 
 
@@ -300,7 +305,7 @@ class Stat {
 
         **{ self.count } total posts** have been written on { $!year }.
         There have been *{ self.count-tags } different tags* used, the most
-        used popular being (in order of number of posts):
+        popular being (sorted by number of posts):
         _MD_
         for self.tags -> $tag-pair {
             $markdown = "%s \n- *%s* (%d posts) ".sprintf: $markdown, $tag-pair.key, $tag-pair.value;
@@ -325,7 +330,7 @@ class Stat {
         <br/>
 
         <br/>
-        The following is the overall { $!year } post ratio by tag:
+        The following is the overall { $!year } post ratio by tag (showing max { $!tag-limit } tags):
         <br/>
           <center>
             <img src="{ self!graph-tags-url.Str }" alt="{ $!year } post ratio per tag" />
@@ -480,6 +485,10 @@ multi sub MAIN(
     , Str :$graph-color?
           where { .uc ~~ / ^ <[0..9A..F]> ** 6 / }
     = 'BB00FF'
+
+    , Int :$tag-limit?
+          where { $_ > 0 }
+    = 30
 )
 {
     my Blog $blog = Blog.new( :dir-home( $jekyll-home ),
@@ -529,6 +538,7 @@ multi sub MAIN(
         my $stat = Stat.new: posts => @current-posts ,
         year => $_,
         blog => $blog,
+        tag-limit => $tag-limit,
         graph-color => $graph-color;
 
         say colored( $stat.Str, 'green' ) if $*verbose;
@@ -640,5 +650,10 @@ sub USAGE() {
 
    The color of the graphs can be customized with the `--grap-color` option, that accepts an RGB
    string (e.g., '00BB77') that will be used. If none is provided, the default color 'BB00FF' will be used.
-   EOH
+
+   The number of the tags shown in the "Tag Ratio" graph can be customized with the `--tag-limit` option.
+   The default value is 30, you can increase or decrease such value but please consider that such value could make the graph labels overlapping. As an example:
+                            {$*PROGRAM.IO.basename} --jekyll-home=/path/to/blog --tag-count=20
+
+  EOH
 }

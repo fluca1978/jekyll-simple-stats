@@ -17,7 +17,7 @@ The script names are different: the Raku script has a shorter name `jss.p6`, whi
 ## Synopsis
 
 ```shell
-% perl6 jss.p6 --jekyll-home=<where is your blog> 
+% raku jss.p6 --jekyll-home=<where is your blog> 
 ```
 
 ## Usage
@@ -72,7 +72,7 @@ It is possible to run the script in dry-run mode via the `--dry-run` option. Thi
 As an example:
 
 ```shell
-% perl6 jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io  --dry-run
+% raku jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io  --dry-run
 ...
 {% include stats/2020.md %}
 {% include stats/credits.md %}
@@ -96,9 +96,13 @@ The script uses the `--jekyll-home` value to compute automatically the directori
 
 It is possible to change the color of the graphs by using the command line argument `--graph-color` that accepts an RGB like string, for example
 
-     % perl6 jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io --graph-color=00aacc
+     % raku jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io --graph-color=00aacc
      
-     
+### Number of Tags in the Graph
+
+It is possible to customize the number of tags to be included in the "Tag Ratio" graph with the option `--tag-limit`, that defaults to `30`. This means that in the graph no more tags then `--tag-limit` will be displayed.
+
+     % raku jss.p6 --jekyll-home=/home/luca/git/fluca1978.github.io --tag-limit=10
 
 ## Dependencies (of the Raku version)
 
