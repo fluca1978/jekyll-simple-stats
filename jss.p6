@@ -442,13 +442,25 @@ class Blog {
         corresponding year:
         _MD_
 
-        for @!years {
-            $md ~= "\n- [{$_}](#$_);";
+        my Str $years-md;
+        my $decade;
+        for @!years.sort {
+            my $current-decade = ( $_ / 10 ).floor;
+
+            if $decade != $current-decade {
+                $years-md ~= "\n- ";
+                $decade = $current-decade;
+            }
+            else {
+                $years-md ~= ', ';
+            }
+
+            $years-md ~= "[{$_}](#$_)";
         }
 
         # output the file
         my $credits-file = $!dir-stats.IO.add( 'quick-links.md' );
-        $credits-file.spurt: $md;
+        $credits-file.spurt: [ $md, '<br/>', $years-md ];
 
         return '{%% include %s %%}'.sprintf: $credits-file.path.split( '/' ).reverse[ 1, 0 ].join( '/' );
     }
