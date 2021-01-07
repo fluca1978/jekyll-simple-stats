@@ -301,6 +301,7 @@ class Stat {
         self!generate-months-graph;
 
         my $markdown = qq:to/_MD_/;
+        <a name="{ $!year }" />
         ## { $!year } { self!is-current-year ?? '(work in progress)' !! '' }
 
         **{ self.count } total posts** have been written on { $!year }.
@@ -427,6 +428,31 @@ class Blog {
     }
 
 
+    # Generate a section in the markdown
+    # to provide a quick link list to jump to a specific
+    # year in the report.
+    #
+    # Returns the markdown command to include
+    # the file, such as
+    # {% include stats/quick-links.md %}
+    method generate-markdown-year-links {
+        my $md = qq:to/_MD_/;
+        ## Quick jump to the years
+        Select one of the following links to quickly jump to the
+        corresponding year:
+        _MD_
+
+        for @!years {
+            $md ~= "\n- [{$_}](#$_);";
+        }
+
+        # output the file
+        my $credits-file = $!dir-stats.IO.add( 'quick-links.md' );
+        $credits-file.spurt: $md;
+
+        return '{%% include %s %%}'.sprintf: $credits-file.path.split( '/' ).reverse[ 1, 0 ].join( '/' );
+    }
+
     method generate-markdown-credits {
         my $md = qq:to/_MD_/;
         <small>
@@ -549,6 +575,10 @@ multi sub MAIN(
         # store the include instructions
         @include-instructions.push: $stat.jekyll-include-string;
     }
+
+    # include also the links for the quick year selection
+    # but only if not running in single year mode
+    @include-instructions.push: $blog.generate-markdown-year-links if ! $year;
 
     @include-instructions.unshift: $blog.generate-markdown-credits if ! $dry-run;
 
