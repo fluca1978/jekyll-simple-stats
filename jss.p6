@@ -448,7 +448,7 @@ class Blog {
             my $current-decade = ( $_ / 10 ).floor;
 
             if $decade != $current-decade {
-                $years-md ~= "\n- ";
+                $years-md ~= "\n- years { $current-decade * 10 } - { $current-decade * 10 + 9 }: ";
                 $decade = $current-decade;
             }
             else {
