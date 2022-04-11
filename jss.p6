@@ -219,6 +219,8 @@ class Stat {
         my @data = self.tags.map: { [ .key, .value ] };
         my AnyTicsTic @tics = self.tags.map: { %( label => .key, pos => $++ ) };
 
+
+
         my $gnuplot = Chart::Gnuplot.new:
         terminal => 'png',
         filename => $!graph-tags-filename.Str;
@@ -411,7 +413,7 @@ class Blog {
             @!posts.push: $post;
 
             # store the year
-            @!years.push( $post.year ) if ! @!years.contains( $post.year );
+            @!years.push( $post.year ) if ! @!years.grep( $post.year );
         }
 
         fail "No posts found in the blog!" if ! @!posts;
@@ -499,11 +501,11 @@ multi sub MAIN( Bool :$help )
 
 multi sub MAIN(
     Str :$jekyll-home
-    where { .so && .IO.d // warn "Please specify an existing home directory [$jekyll-home]" }
+    where { .so && .IO.d }
 
 
     , Str :$dir-posts?
-          where { ! .defined || .IO.d || warn "Not an existing posts directory [$dir-posts]" }
+          where { ! .defined || .IO.d  }
     = $jekyll-home ~ '/_posts'
 
     , Str :$dir-images?
@@ -515,8 +517,7 @@ multi sub MAIN(
 
     , Str :$year?
           where { ! .defined
-                  || $_ ~~ / \d ** 4 | current | last | previous /
-                  || warn 'Year must be of four digits!' }
+                  || $_ ~~ / \d ** 4 | current | last | previous /  }
 
     , Bool :$dry-run?
     , Bool :$*verbose?
