@@ -501,11 +501,11 @@ multi sub MAIN( Bool :$help )
 
 multi sub MAIN(
     Str :$jekyll-home
-    where { .so && .IO.d }
+    where { $jekyll-home.so && $jekyll-home.IO.d // warn "Specificy the home directory [$jekyll-home]" }
 
 
     , Str :$dir-posts?
-          where { ! .defined || .IO.d  }
+          where { ! $dir-posts.defined || $dir-posts.IO.d  }
     = $jekyll-home ~ '/_posts'
 
     , Str :$dir-images?
@@ -516,8 +516,9 @@ multi sub MAIN(
 
 
     , Str :$year?
-          where { ! .defined
-                  || $_ ~~ / \d ** 4 | current | last | previous /  }
+          where { ! $year.defined
+                  || $year ~~ / \d ** 4 | current | last | previous /
+                // warn "Year must be a four digit number or a special keyword current,last, previous" }
 
     , Bool :$dry-run?
     , Bool :$*verbose?
@@ -641,6 +642,8 @@ multi sub MAIN(
 
 sub USAGE() {
     print qq:to/EOH/;
+
+
     { $*USAGE }
 
     Generates statistics data about your blog depending on how you named the posts
